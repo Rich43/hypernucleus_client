@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="/">
+    <file>x.png</file>
+    <file>exit.png</file>
+    <file>trashcan_empty.png</file>
+    <file>advancedsettings.png</file>
+    <file>exec.png</file>
+  </qresource>
+</RCC>
