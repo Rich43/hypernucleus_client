@@ -1,2 +1,4 @@
 .project
 .pydevproject
+hypernucleus/view/main.py
+hypernucleus/view/icons.py
