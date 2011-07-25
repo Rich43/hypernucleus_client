@@ -50,3 +50,15 @@ class MainWindow(QMainWindow):
     @QtCore.pyqtSlot()
     def settings(self):
         print("Method 'settings' executed.")
+        
+    def resizeEvent(self, event):
+        self.move_resize()
+    
+    def moveEvent(self, event):
+        self.move_resize()
+    
+    def move_resize(self):
+        if not hasattr(self, "i"):
+            self.i = 0
+        self.i += 1
+        print("Method 'move_resize' executed." + str(self.i))
