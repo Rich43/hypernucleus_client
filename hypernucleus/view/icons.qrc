@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/">
+    <file>dep.png</file>
+    <file>games.png</file>
+    <file>xcf.png</file>
+    <file>info.png</file>
     <file>x.png</file>
     <file>exit.png</file>
     <file>trashcan_empty.png</file>

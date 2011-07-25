@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QTabWidget" name="tabGameDep">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -30,15 +30,19 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab_3">
+       <widget class="QWidget" name="tabGame">
+        <attribute name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/games.png</normaloff>:/games.png</iconset>
+        </attribute>
         <attribute name="title">
          <string>Games</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <layout class="QVBoxLayout" name="verticalLayoutGameSearchTV">
            <item>
-            <layout class="QFormLayout" name="formLayout_2">
+            <layout class="QFormLayout" name="formLayoutGameSearch">
              <item row="0" column="0">
               <widget class="QLabel" name="searchForGameLabel">
                <property name="text">
@@ -52,7 +56,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QTreeView" name="treeView">
+            <widget class="QTreeView" name="treeGame">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -65,29 +69,33 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_4">
+       <widget class="QWidget" name="tabDep">
+        <attribute name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/dep.png</normaloff>:/dep.png</iconset>
+        </attribute>
         <attribute name="title">
          <string>Dependencies</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QVBoxLayout" name="verticalLayoutDepSearchTV">
            <item>
-            <layout class="QFormLayout" name="formLayout_3">
+            <layout class="QFormLayout" name="formLayoutDepSearch">
              <item row="0" column="0">
-              <widget class="QLabel" name="searchForGameLabel_2">
+              <widget class="QLabel" name="searchForDepLabel">
                <property name="text">
                 <string>Search for dependency:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="searchForGameLineEdit_2"/>
+              <widget class="QLineEdit" name="searchForDepLineEdit"/>
              </item>
             </layout>
            </item>
            <item>
-            <widget class="QTreeView" name="treeView_2">
+            <widget class="QTreeView" name="treeDep">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -101,11 +109,15 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QTabWidget" name="tabWidget_2">
+      <widget class="QTabWidget" name="tabInfoPic">
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="tab_5">
+       <widget class="QWidget" name="tabInfo">
+        <attribute name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/info.png</normaloff>:/info.png</iconset>
+        </attribute>
         <attribute name="title">
          <string>Information</string>
         </attribute>
@@ -225,7 +237,11 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_6">
+       <widget class="QWidget" name="tabPic">
+        <attribute name="icon">
+         <iconset resource="icons.qrc">
+          <normaloff>:/xcf.png</normaloff>:/xcf.png</iconset>
+        </attribute>
         <attribute name="title">
          <string>Pictures</string>
         </attribute>
