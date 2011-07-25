@@ -19,6 +19,8 @@ from hypernucleus.library.paths import Paths
 from os.path import exists
 from os import makedirs
 from configparser import ConfigParser
+PROJNAME = "hypernucleus"
+
 class INIManager:
     """
     Manages hypernucleus's INI File
@@ -50,8 +52,8 @@ class INIManager:
         if exists(p.inipath):
             self.conf_file.read(p.inipath)
         else:
-            self.conf_file.add_section("hypernucleus")
-            self.conf_file.set("hypernucleus", "xmlurl", self.defaulturl)
+            self.conf_file.add_section(PROJNAME)
+            self.conf_file.set(PROJNAME, "xmlurl", self.defaulturl)
             self.save()
             
     def save(self):
@@ -59,17 +61,17 @@ class INIManager:
         Write settings to file
         """
         p = Paths()
-        self.conf_file.write(open(p.inipath, "w"))
+        self.conf_file.write(open(p.inipath, "wb"))
         
     def get_xmlurl(self):
         """
         Get Data File XML URL
         """
-        return self.conf_file.get("hypernucleus", "xmlurl")
+        return self.conf_file.get(PROJNAME, "xmlurl")
         
     def set_xmlurl(self, url):
         """
         Set Data File XML URL
         """
-        self.conf_file.set("hypernucleus", "xmlurl", url)
+        self.conf_file.set(PROJNAME, "xmlurl", url)
         self.save()
