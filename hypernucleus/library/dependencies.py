@@ -16,7 +16,7 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import unittest
-from hypernucleus.library.ini_manager import INIManager
+from hypernucleus.model.ini_manager import INIManager
 
 class UnavailableDependencyError(Exception):
     def __init__(self, modulename):
