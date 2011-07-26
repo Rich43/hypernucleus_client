@@ -1,4 +1,4 @@
-#PyGameDB, A database of games made in python with automatic installation.
+#hypernucleus, A database of games made in python with automatic installation.
 #Copyright (C) 2008  Richie Ward + Contributors.
 
 #This program is free software; you can redistribute it and/or
