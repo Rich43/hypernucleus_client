@@ -6,6 +6,7 @@ Created on 23 Jul 2011
 
 from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
+from hypernucleus.model.tree_model import TreeModel, TreeItem
 from PyQt4.QtGui import QMainWindow
 from PyQt4 import uic, QtCore
 import sys
@@ -17,6 +18,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = uic.loadUi(main_path, self)
+        tree_model = TreeModel(TreeItem(["Item"]))
+        self.ui.treeGame.setModel(tree_model)
+        print(self.ui.treeGame.model(), dir(self.ui.treeGame.model()))
         ini_mgr = INIManager()
         dimentions = ini_mgr.get_window_dimentions()
         self.setGeometry(QtCore.QRect(dimentions.x, dimentions.y,
