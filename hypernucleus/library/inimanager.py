@@ -18,14 +18,27 @@
 from hypernucleus.library.paths import Paths
 from os.path import exists
 from os import makedirs
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError
+
 PROJNAME = "hypernucleus"
+
+class WindowDimentions:
+    """
+    Handy object for carting around x,y,width,height
+    """
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
 
 class INIManager:
     """
     Manages hypernucleus's INI File
     """
     default_url = "http://hypernucleus.pynguins.com/outputs/xml"
+    default_multi = 1
+    default_arch = "i386"
     conf_file = None
     inipath = None
     
@@ -67,11 +80,86 @@ class INIManager:
         """
         Get Data File XML URL
         """
-        return self.conf_file.get(PROJNAME, "xmlurl")
+        try:
+            return self.conf_file.get(PROJNAME, "xmlurl")
+        except NoOptionError:
+            return self.default_url
         
     def set_xml_url(self, url):
         """
         Set Data File XML URL
         """
         self.conf_file.set(PROJNAME, "xmlurl", url)
+        self.save()
+        
+    def get_multiplier(self):
+        """
+        Get multiplier
+        """
+        try:
+            return self.conf_file.get(PROJNAME, "multiplier")
+        except NoOptionError:
+            return self.default_multi
+        
+    def set_multiplier(self, multiplier):
+        """
+        Set multiplier
+        """
+        self.conf_file.set(PROJNAME, "multiplier", multiplier)
+        self.save()
+    
+    def get_architecture(self):
+        """
+        Get architecture
+        """
+        try:
+            return self.conf_file.get(PROJNAME, "architecture")
+        except NoOptionError:
+            return self.default_arch
+        
+    def set_architecture(self, architecture):
+        """
+        Set architecture
+        """
+        self.conf_file.set(PROJNAME, "architecture", architecture)
+        self.save()
+
+    def get_operating_system(self):
+        """
+        Get operating system
+        """
+        try:
+            return self.conf_file.get(PROJNAME, "operating_system")
+        except NoOptionError:
+            return self.__detect_os()
+        
+    def set_operating_system(self, operating_system):
+        """
+        Set operating system
+        """
+        self.conf_file.set(PROJNAME, "operating_system", operating_system)
+        self.save()
+        
+    def get_window_dimentions(self):
+        """
+        Get window dimentions
+        """
+        x = self.conf_file.get(PROJNAME, "x")
+        y = self.conf_file.get(PROJNAME, "y")
+        width = self.conf_file.get(PROJNAME, "width")
+        height = self.conf_file.get(PROJNAME, "height")
+        return WindowDimentions(x, y, width, height)
+        
+    def set_window_dimentions(self, window_dimentions_obj):
+        """
+        Set window dimentions
+        """
+        self.conf_file.set(PROJNAME, "x", 
+                           window_dimentions_obj.x)
+        self.conf_file.set(PROJNAME, "y", 
+                           window_dimentions_obj.y)
+        self.conf_file.set(PROJNAME, "width", 
+                           window_dimentions_obj.width)
+        self.conf_file.set(PROJNAME, "height", 
+                           window_dimentions_obj.height)
         self.save()
