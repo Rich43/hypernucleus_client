@@ -37,7 +37,7 @@ def user_data_dir(appname, owner=None, version=None):
             would typically be "<major>.<minor>".
     
     Typical user data directories are:
-        Windows:    C:\Documents and Settings\USER\Application Data\<owner>\<appname>
+        Windows:    C:/Documents and Settings/USER/Application Data/<owner>/<appname>
         Mac OS X:   ~/Library/Application Support/<appname>
         Unix:       ~/.config/<lowercased-appname>
     """
@@ -105,6 +105,6 @@ def site_data_dir(appname, owner=None, version=None):
 
 
 if __name__ == "__main__":
-    print "applib: user data dir:", user_data_dir("Komodo", "ActiveState")
-    print "applib: site data dir:", site_data_dir("Komodo", "ActiveState")
+    print("applib: user data dir:", user_data_dir("Komodo", "ActiveState"))
+    print("applib: site data dir:", site_data_dir("Komodo", "ActiveState"))
 

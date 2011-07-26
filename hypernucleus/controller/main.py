@@ -5,6 +5,7 @@ Created on 23 Jul 2011
 '''
 
 from hypernucleus.view import main_path
+from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from PyQt4.QtGui import QMainWindow
 from PyQt4 import uic, QtCore
 import sys
@@ -16,6 +17,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = uic.loadUi(main_path, self)
+        ini_mgr = INIManager()
+        dimentions = ini_mgr.get_window_dimentions()
+        self.setGeometry(QtCore.QRect(dimentions.x, dimentions.y,
+                                      dimentions.width, dimentions.height))
         self.q_connect("actionExit", "exit")
         self.q_connect("actionRun", "run")
         self.q_connect("actionStop", "stop")
@@ -56,9 +61,10 @@ class MainWindow(QMainWindow):
     
     def moveEvent(self, event):
         self.move_resize()
-    
+     
     def move_resize(self):
-        if not hasattr(self, "i"):
-            self.i = 0
-        self.i += 1
-        print("Method 'move_resize' executed." + str(self.i))
+        ini_mgr = INIManager()
+        q_rect = self.geometry()
+        dimentions = WindowDimentions(q_rect.x(), q_rect.y(), 
+                                      q_rect.width(), q_rect.height())
+        ini_mgr.set_window_dimentions(dimentions)

@@ -15,12 +15,10 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from hypernucleus.library.paths import Paths
+from hypernucleus.library.paths import Paths, PROJNAME
 from os.path import exists
 from os import makedirs
 from configparser import ConfigParser, NoOptionError
-
-PROJNAME = "hypernucleus"
 
 class WindowDimentions:
     """
@@ -40,7 +38,7 @@ class INIManager:
     default_multi = 1
     default_arch = "i386"
     conf_file = None
-    inipath = None
+    ini_path = None
     
     def __init__(self):
         # Make config directory
@@ -61,20 +59,20 @@ class INIManager:
         # Set variables
         self.conf_file = ConfigParser()
         
-        # Make config file
-        if exists(p.ini_path):
-            self.conf_file.read(p.ini_path)
-        else:
+        if not exists(p.ini_path):
+            # Make config file
             self.conf_file.add_section(PROJNAME)
             self.conf_file.set(PROJNAME, "xmlurl", self.default_url)
             self.save()
-            
+        
+        self.conf_file.read(p.ini_path)
+        
     def save(self):
         """
         Write settings to file
         """
         p = Paths()
-        self.conf_file.write(open(p.inipath, "wb"))
+        self.conf_file.write(open(p.ini_path, "w"))
         
     def get_xml_url(self):
         """
@@ -97,7 +95,7 @@ class INIManager:
         Get multiplier
         """
         try:
-            return self.conf_file.get(PROJNAME, "multiplier")
+            return self.conf_file.getint(PROJNAME, "multiplier")
         except NoOptionError:
             return self.default_multi
         
@@ -105,7 +103,7 @@ class INIManager:
         """
         Set multiplier
         """
-        self.conf_file.set(PROJNAME, "multiplier", multiplier)
+        self.conf_file.set(PROJNAME, "multiplier", str(multiplier))
         self.save()
     
     def get_architecture(self):
@@ -144,10 +142,10 @@ class INIManager:
         """
         Get window dimentions
         """
-        x = self.conf_file.get(PROJNAME, "x")
-        y = self.conf_file.get(PROJNAME, "y")
-        width = self.conf_file.get(PROJNAME, "width")
-        height = self.conf_file.get(PROJNAME, "height")
+        x = self.conf_file.getint(PROJNAME, "x")
+        y = self.conf_file.getint(PROJNAME, "y")
+        width = self.conf_file.getint(PROJNAME, "width")
+        height = self.conf_file.getint(PROJNAME, "height")
         return WindowDimentions(x, y, width, height)
         
     def set_window_dimentions(self, window_dimentions_obj):
@@ -155,11 +153,11 @@ class INIManager:
         Set window dimentions
         """
         self.conf_file.set(PROJNAME, "x", 
-                           window_dimentions_obj.x)
+                           str(window_dimentions_obj.x))
         self.conf_file.set(PROJNAME, "y", 
-                           window_dimentions_obj.y)
+                           str(window_dimentions_obj.y))
         self.conf_file.set(PROJNAME, "width", 
-                           window_dimentions_obj.width)
+                           str(window_dimentions_obj.width))
         self.conf_file.set(PROJNAME, "height", 
-                           window_dimentions_obj.height)
+                           str(window_dimentions_obj.height))
         self.save()

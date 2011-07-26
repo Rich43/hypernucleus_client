@@ -17,11 +17,14 @@
 from hypernucleus.library.find_path import user_data_dir
 from os.path import join, exists
 import getpass
+
+PROJNAME = "hypernucleus"
+
 class Paths:
     """
     Contains path variables
     """
-    datadir = user_data_dir("hypernucleus", owner=getpass.getuser())
+    datadir = user_data_dir(PROJNAME, owner=getpass.getuser())
     ini_path = join(datadir, "config.ini")
     games = join(datadir, "games")
     dependencys = join(datadir, "dependencys")
