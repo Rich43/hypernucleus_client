@@ -25,7 +25,7 @@ class INIManager:
     """
     Manages hypernucleus's INI File
     """
-    defaulturl = "http://hypernucleus.pynguins.com/outputs/xml"
+    default_url = "http://hypernucleus.pynguins.com/outputs/xml"
     conf_file = None
     inipath = None
     
@@ -49,11 +49,11 @@ class INIManager:
         self.conf_file = ConfigParser()
         
         # Make config file
-        if exists(p.inipath):
-            self.conf_file.read(p.inipath)
+        if exists(p.ini_path):
+            self.conf_file.read(p.ini_path)
         else:
             self.conf_file.add_section(PROJNAME)
-            self.conf_file.set(PROJNAME, "xmlurl", self.defaulturl)
+            self.conf_file.set(PROJNAME, "xmlurl", self.default_url)
             self.save()
             
     def save(self):
@@ -63,13 +63,13 @@ class INIManager:
         p = Paths()
         self.conf_file.write(open(p.inipath, "wb"))
         
-    def get_xmlurl(self):
+    def get_xml_url(self):
         """
         Get Data File XML URL
         """
         return self.conf_file.get(PROJNAME, "xmlurl")
         
-    def set_xmlurl(self, url):
+    def set_xml_url(self, url):
         """
         Set Data File XML URL
         """

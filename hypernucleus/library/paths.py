@@ -22,7 +22,7 @@ class Paths:
     Contains path variables
     """
     datadir = user_data_dir("hypernucleus", owner=getpass.getuser())
-    inipath = join(datadir, "config.ini")
+    ini_path = join(datadir, "config.ini")
     games = join(datadir, "games")
     dependencys = join(datadir, "dependencys")
     pictures = join(datadir, "pictures")
