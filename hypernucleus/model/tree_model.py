@@ -3,12 +3,20 @@ from PyQt4 import QtCore
 class TreeItem(object):
     def __init__(self, data, parent=None):
         self.parentItem = parent
-        self.itemData = data
+        data_list = []
+        if isinstance(data, str):
+            data_list.append(data)
+        elif isinstance(data, list):
+            data_list.extend(data)
+        else:
+            raise TypeError
+        self.itemData = data_list
         self.childItems = []
 
     def appendChild(self, item):
         self.childItems.append(item)
-
+        return item
+    
     def child(self, row):
         return self.childItems[row]
 
@@ -36,7 +44,18 @@ class TreeItem(object):
 class TreeModel(QtCore.QAbstractItemModel):
     def __init__(self, rootItem, parent=None):
         super(TreeModel, self).__init__(parent)
-        self.rootItem = rootItem
+        
+        root_list = []
+        
+        if isinstance(rootItem, str):
+            root_list.append(rootItem)
+        elif isinstance(rootItem, list):
+            root_list.extend(rootItem)
+        else:
+            raise TypeError
+        
+        self.rootItem = TreeItem(root_list)
+        self.appendChild = self.rootItem.appendChild
         
     def columnCount(self, parent):
         if parent.isValid():
