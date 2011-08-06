@@ -12,6 +12,9 @@ class InvalidGameDepType(Exception):
 class ModuleNameNotFound(Exception):
     pass
 
+class RevisionNotFound(Exception):
+    pass
+
 class XmlModel:
     """
     An XML data model
@@ -26,14 +29,18 @@ class XmlModel:
             self.type = DEP
         else:
             raise InvalidGameDepType
-        
+    
+    def list_module_names(self):
+        item = self.etree.findall(self.type)
+        return [x.find("name").text for x in item]
+    
     def get_module_name(self, name):
         name = quoteattr(name)
-        item = self.etree.findall(self.type + "[name=%s]" % name)
+        item = self.etree.find(self.type + "[name=%s]" % name)
         if not len(item):
             raise ModuleNameNotFound
         else:
-            return item[0]
+            return item
     
     def get_display_name(self, module_name):
         item = self.get_module_name(module_name)
@@ -56,6 +63,40 @@ class XmlModel:
             except URLError:
                 pass
         return result
+    
+    def list_revisions(self, module_name):
+        """
+        Return sorted list of revisions.
+        Biggest number first.
+        """
+        item = self.get_module_name(module_name)
+        itemtwo = item.findall("revision")
+        result = [float(x.find("version").text) for x in itemtwo]
+        result.sort(reverse=True)
+        return result
+    
+    def get_revision(self, module_name, revision):
+        revision = str(revision)
+        item = self.get_module_name(module_name)
+        name = quoteattr(revision)
+        itemtwo = item.find("revision[version=%s]" % name)
+        if not len(itemtwo):
+            raise RevisionNotFound
+        else:
+            return itemtwo
+
+    def get_revision_source(self, module_name, revision):
+        item = self.get_revision(module_name, revision)
+        return urlopen(item.find("source").text)
+
+    def get_revision_created(self, module_name, revision):
+        item = self.get_revision(module_name, revision)
+        return item.find("created").text
+
+    def get_revision_module_type(self, module_name, revision):
+        item = self.get_revision(module_name, revision)
+        return item.find("moduletype").text
+    
     """
     def load(self):
         item_id = 0
@@ -79,5 +120,6 @@ class XmlModel:
 
 """
 x = XmlModel(GAME, "http://hypernucleus.pynguins.com/outputs/xml")
-print(x.get_pictures("ball"))
+name = "anotherball"
+print(x.get_revision_source(name, x.list_revisions(name)[0]))
 """
