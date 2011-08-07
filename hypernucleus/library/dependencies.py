@@ -30,9 +30,9 @@ class UnmatchedDependencyVersionError(Exception):
 class OptionalParameterUnsatisfiedError(Exception):
     pass
 
-def check_dependencys(game_deps, available_deps):
+def check_dependencies(game_deps, available_deps):
     """
-    Check if dependencys are satisfied and versions match
+    Check if dependencies are satisfied and versions match
     """
     ini_data = INIManager()
     
@@ -68,22 +68,22 @@ class TestDependencys(unittest.TestCase):
     
     def test_dep_unsatisfied(self):
         game_deps = {'qwe': {'modulename': 'qwe'}}
-        self.assertRaises(UnavailableDependencyError, check_dependencys,
+        self.assertRaises(UnavailableDependencyError, check_dependencies,
                           game_deps, self.available_deps)
 
     def test_dep_unsatisfied(self):
         game_deps = {'qwe': {'version': 'xx'}}
-        self.assertRaises(UnavailableDependencyError, check_dependencys,
+        self.assertRaises(UnavailableDependencyError, check_dependencies,
                           game_deps, self.available_deps)
 
     def test_versions_dont_match(self):
         game_deps = {'foo': {'version': '2.0'}}
-        self.assertRaises(UnmatchedDependencyVersionError, check_dependencys,
+        self.assertRaises(UnmatchedDependencyVersionError, check_dependencies,
                           game_deps, self.available_deps)
 
     def test_optional_parameter(self):
         game_deps = {'foo': {'version': '1.0'}}
-        self.assertRaises(OptionalParameterUnsatisfiedError, check_dependencys,
+        self.assertRaises(OptionalParameterUnsatisfiedError, check_dependencies,
                           game_deps, self.available_deps)
 
 if __name__ == '__main__':

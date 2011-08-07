@@ -15,7 +15,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from hypernucleus.library.find_path import user_data_dir
-from os.path import join, exists
+from os.path import join
 import getpass
 
 PROJNAME = "hypernucleus"
@@ -27,15 +27,7 @@ class Paths:
     datadir = user_data_dir(PROJNAME, owner=getpass.getuser())
     ini_path = join(datadir, "config.ini")
     games = join(datadir, "games")
-    dependencys = join(datadir, "dependencys")
+    dependencies = join(datadir, "dependencies")
     pictures = join(datadir, "pictures")
     archives = join(datadir, "archives")
     
-    def is_game_installed(self, modulename):
-        """
-        Check if game is installed
-        """
-        if exists(join(self.games, modulename)):
-            return True
-        else:
-            return False

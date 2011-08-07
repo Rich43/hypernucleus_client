@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 from hypernucleus.library.paths import Paths
 import urllib.request, urllib.error
 import os
-from os.path import join, basename
+from os.path import join, basename, exists
 import tarfile
 import shutil
 
@@ -29,7 +29,7 @@ class ModuleInstaller(object):
         self.moduledata = moduledata
         self.moduletype = moduletype
         if self.moduletype is 'dependency':
-            self.extract_path = self.path.dependencys
+            self.extract_path = self.path.dependencies
         elif self.moduletype is 'game':
             self.extract_path = self.path.games
         else:
@@ -104,18 +104,35 @@ class ModuleInstaller(object):
         except OSError:
             pass
 
-def uninstall_module(modulename, moduletype):
-    """
-    Uninstall a module removing its files
-    """
-    path = Paths()
+    def uninstall_module(self, modulename, moduletype):
+        """
+        Uninstall a module removing its files
+        """
+        
+        if moduletype is 'dependency':
+            extract_path = self.path.dependencies
+        elif moduletype is 'game':
+            extract_path = self.path.games
+        else:
+            raise ModuleTypeError()
     
-    if moduletype is 'dependency':
-        extract_path = path.dependencys
-    elif moduletype is 'game':
-        extract_path = path.games
-    else:
-        raise ModuleTypeError()
+        path_to_module = join(extract_path, modulename)
+        shutil.rmtree(path_to_module, ignore_errors=True)
 
-    path_to_module = join(extract_path, modulename)
-    shutil.rmtree(path_to_module, ignore_errors=True)
+    def is_game_installed(self, modulename):
+        """
+        Check if game is installed
+        """
+        if exists(join(self.path.games, modulename)):
+            return True
+        else:
+            return False
+
+    def is_dependency_installed(self, modulename):
+        """
+        Check if dependency is installed
+        """
+        if exists(join(self.path.dependencies, modulename)):
+            return True
+        else:
+            return False

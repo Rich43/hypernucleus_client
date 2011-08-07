@@ -47,8 +47,8 @@ class INIManager:
         if not exists(p.games):
             makedirs(p.games)
             
-        if not exists(p.dependencys):
-            makedirs(p.dependencys)
+        if not exists(p.dependencies):
+            makedirs(p.dependencies)
         
         if not exists(p.pictures):
             makedirs(p.pictures)

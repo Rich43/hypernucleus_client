@@ -3,7 +3,7 @@ Created on 23 Jul 2011
 
 @author: r
 '''
-
+from random import randint
 from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
@@ -30,6 +30,8 @@ class MainWindow(QMainWindow):
         self.quick_connect("actionStop", "stop")
         self.quick_connect("actionUninstall", "uninstall")
         self.quick_connect("actionSettings", "settings")
+        self.ui.treeGame.doubleClicked.connect(self.game)
+        self.ui.treeDep.doubleClicked.connect(self.dep)
         
     def quick_connect(self, action_name, method_name):
         """
@@ -57,8 +59,10 @@ class MainWindow(QMainWindow):
         installed_append = installed.appendChild
         for i in range(50):
             self.dummy_count += 1
-            dummy = installed_append(TreeItem(
-                            "Dummy " + str(self.dummy_count), installed))
+            item_to_append = TreeItem(
+                            "Dummy " + str(self.dummy_count), installed)
+            item_to_append.tag = randint(1, 1000)
+            dummy = installed_append(item_to_append)
             dummies.append(dummy)
             
         # Add Not Installed root item
@@ -66,13 +70,32 @@ class MainWindow(QMainWindow):
         not_ins_append = not_installed.appendChild
         for i in range(50):
             self.dummy_count += 1
-            dummy = not_ins_append(TreeItem(
-                            "Dummy " + str(self.dummy_count), not_installed))
+            item_to_append = TreeItem(
+                            "Dummy " + str(self.dummy_count), not_installed)
+            item_to_append.tag = randint(1, 1000)
+            dummy = not_ins_append(item_to_append)
             dummies.append(dummy)
             
         # Output the model
         return tree_model
-        
+
+    def get_selected_item(self):
+        ci = self.sender().currentIndex()
+        parent_row = ci.parent().row()
+        if parent_row > -1:
+            item = ci.model().rootItem.child(parent_row).childItems[ci.row()]
+            return item
+        else:
+            return None
+
+    @QtCore.pyqtSlot()
+    def game(self):
+        print(self.get_selected_item())
+
+    @QtCore.pyqtSlot()
+    def dep(self):
+        print(self.get_selected_item())
+
     @QtCore.pyqtSlot()
     def exit(self):
         sys.exit()
