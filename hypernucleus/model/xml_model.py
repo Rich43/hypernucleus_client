@@ -1,10 +1,8 @@
+from hypernucleus.model import GAME, DEP
 from urllib.request import urlopen
 from urllib.error import URLError
 from xml.etree.ElementTree import ElementTree
 from xml.sax.saxutils import quoteattr
-
-GAME = "game"
-DEP = "dependency"
 
 class InvalidGameDepType(Exception):
     pass
@@ -104,7 +102,7 @@ class XmlModel:
             # Put XML attributes into a dictionary
             try:
                 attribs = ["name", "version", "description", "picture",
-                "archiveurl", "modulename", "moduletype", "author"]
+                "archiveurl", "module_name", "module_type", "author"]
                 result = {}
                 for attrib in attribs:
                     result[attrib] = item.find(attrib).text

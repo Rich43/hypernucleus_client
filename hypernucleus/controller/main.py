@@ -3,10 +3,12 @@ Created on 23 Jul 2011
 
 @author: r
 '''
-from random import randint
+
 from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
+from hypernucleus.model.xml_model import XmlModel as Model
+from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED
 from PyQt4.QtGui import QMainWindow
 from PyQt4 import uic, QtCore
 import sys
@@ -18,13 +20,19 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = uic.loadUi(main_path, self)
-        self.dummy_count = 0
-        self.ui.treeGame.setModel(self.configure_model())
-        self.ui.treeDep.setModel(self.configure_model())
-        ini_mgr = INIManager()
-        dimentions = ini_mgr.get_window_dimentions()
+        
+        # Set the window dimensions from config.
+        self.ini_mgr = INIManager()
+        dimentions = self.ini_mgr.get_window_dimentions()
         self.setGeometry(QtCore.QRect(dimentions.x, dimentions.y,
                                       dimentions.width, dimentions.height))
+        
+        # Fill treeview with content.
+        self.root_items = {GAME: {}, DEP: {}}
+        self.ui.treeGame.setModel(self.configure_model(GAME))
+        self.ui.treeDep.setModel(self.configure_model(DEP))
+        
+        # Connect all signals/events
         self.quick_connect("actionExit", "exit")
         self.quick_connect("actionRun", "run")
         self.quick_connect("actionStop", "stop")
@@ -42,40 +50,30 @@ class MainWindow(QMainWindow):
                      QtCore.SIGNAL('triggered()'), 
                      self, QtCore.SLOT(method_name + '()'))
         
-    def configure_model(self):
+    def configure_model(self, module_type):
         """
         Add items to a Tree View model.
         """
         # Make the title bar.
         tree_model = TreeModel("")
         root_item = tree_model.rootItem
-        append_child = tree_model.appendChild
-        
-        # Dummy item list and counter
-        dummies = []
         
         # Add Installed root item
-        installed = append_child(TreeItem("Installed", root_item))
-        installed_append = installed.appendChild
-        for i in range(50):
-            self.dummy_count += 1
-            item_to_append = TreeItem(
-                            "Dummy " + str(self.dummy_count), installed)
-            item_to_append.tag = randint(1, 1000)
-            dummy = installed_append(item_to_append)
-            dummies.append(dummy)
-            
+        ins = TreeItem(INSTALLED, root_item)
+        self.root_items[module_type][INSTALLED] = ins
+        tree_model.appendChild(ins)
+        
         # Add Not Installed root item
-        not_installed = append_child(TreeItem("Not Installed", root_item))
-        not_ins_append = not_installed.appendChild
-        for i in range(50):
-            self.dummy_count += 1
-            item_to_append = TreeItem(
-                            "Dummy " + str(self.dummy_count), not_installed)
-            item_to_append.tag = randint(1, 1000)
-            dummy = not_ins_append(item_to_append)
-            dummies.append(dummy)
-            
+        not_ins = TreeItem(NOT_INSTALLED, root_item)
+        self.root_items[module_type][NOT_INSTALLED] = not_ins
+        tree_model.appendChild(not_ins)
+        
+        # Populate root items with data.
+        m = Model(module_type, self.ini_mgr.get_xml_url())
+        for m_name in m.list_module_names():
+            module_item = TreeItem(m.get_display_name(m_name), not_ins)
+            module_item.tag = m_name
+            not_ins.appendChild(module_item)
         # Output the model
         return tree_model
 
@@ -90,11 +88,11 @@ class MainWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def game(self):
-        print(self.get_selected_item())
+        print(self.get_selected_item().tag)
 
     @QtCore.pyqtSlot()
     def dep(self):
-        print(self.get_selected_item())
+        print(self.get_selected_item().tag)
 
     @QtCore.pyqtSlot()
     def exit(self):

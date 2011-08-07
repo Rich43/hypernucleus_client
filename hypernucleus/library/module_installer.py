@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 from hypernucleus.library.paths import Paths
+from hypernucleus.model import GAME, DEP
 import urllib.request, urllib.error
 import os
 from os.path import join, basename, exists
@@ -25,12 +26,12 @@ class HeadRequest(urllib.request.Request):
 class ModuleInstaller(object):
     path = Paths()
     
-    def __init__(self, moduledata, moduletype):
+    def __init__(self, moduledata, module_type):
         self.moduledata = moduledata
-        self.moduletype = moduletype
-        if self.moduletype is 'dependency':
+        self.module_type = module_type
+        if self.module_type is DEP:
             self.extract_path = self.path.dependencies
-        elif self.moduletype is 'game':
+        elif self.module_type is GAME:
             self.extract_path = self.path.games
         else:
             raise ModuleTypeError()
@@ -103,36 +104,32 @@ class ModuleInstaller(object):
             os.remove(join(self.path.archives, self.filename))
         except OSError:
             pass
-
-    def uninstall_module(self, modulename, moduletype):
+        
+    def get_extract_path(self, module_type):
+        if module_type is DEP:
+            extract_path = self.path.dependencies
+        elif module_type is GAME:
+            extract_path = self.path.games
+        else:
+            raise ModuleTypeError
+        return extract_path
+    
+    def uninstall_module(self, module_name, module_type):
         """
         Uninstall a module removing its files
         """
-        
-        if moduletype is 'dependency':
-            extract_path = self.path.dependencies
-        elif moduletype is 'game':
-            extract_path = self.path.games
-        else:
-            raise ModuleTypeError()
-    
-        path_to_module = join(extract_path, modulename)
+        extract_path = self.get_extract_path(module_type)
+        path_to_module = join(extract_path, module_name)
         shutil.rmtree(path_to_module, ignore_errors=True)
 
-    def is_game_installed(self, modulename):
+    def is_module_installed(self, module_name, module_type):
         """
-        Check if game is installed
+        Check if module is installed
         """
-        if exists(join(self.path.games, modulename)):
-            return True
-        else:
-            return False
-
-    def is_dependency_installed(self, modulename):
-        """
-        Check if dependency is installed
-        """
-        if exists(join(self.path.dependencies, modulename)):
+        extract_path = self.get_extract_path(module_type)
+        if not module_type in [GAME, DEP]:
+            raise ModuleTypeError
+        if exists(join(extract_path, module_name)):
             return True
         else:
             return False

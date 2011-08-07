@@ -19,13 +19,13 @@ import unittest
 from hypernucleus.model.ini_manager import INIManager
 
 class UnavailableDependencyError(Exception):
-    def __init__(self, modulename):
-        self.message = "%s unavailable" % modulename
+    def __init__(self, module_name):
+        self.message = "%s unavailable" % module_name
 
 class UnmatchedDependencyVersionError(Exception):
-    def __init__(self, modulename, required_version, available_version):
+    def __init__(self, module_name, required_version, available_version):
         self.message = "Version %s of %s is requred, but %s is available" % \
-                       (required_version, modulename, available_version)
+                       (required_version, module_name, available_version)
 
 class OptionalParameterUnsatisfiedError(Exception):
     pass
@@ -36,13 +36,13 @@ def check_dependencies(game_deps, available_deps):
     """
     ini_data = INIManager()
     
-    for modulename, dep_data in list(game_deps.items()):
-        if modulename not in list(available_deps.keys()):
-            raise UnavailableDependencyError(modulename)
+    for module_name, dep_data in list(game_deps.items()):
+        if module_name not in list(available_deps.keys()):
+            raise UnavailableDependencyError(module_name)
         required_version = dep_data['version']
-        available_version = available_deps[modulename]['version']
+        available_version = available_deps[module_name]['version']
         if required_version != available_version:
-            raise UnmatchedDependencyVersionError(modulename,
+            raise UnmatchedDependencyVersionError(module_name,
                                                   required_version,
                                                   available_version)
         # Check for optional parameters
@@ -50,8 +50,8 @@ def check_dependencies(game_deps, available_deps):
         for param in optionals:
             ini_value = ini_data.get(param)
             if (ini_value is not None and
-                param in available_deps[modulename]):
-                if ini_value != available_deps[modulename][param]:
+                param in available_deps[module_name]):
+                if ini_value != available_deps[module_name][param]:
                     raise OptionalParameterUnsatisfiedError()
 
 class TestDependencys(unittest.TestCase):
@@ -67,7 +67,7 @@ class TestDependencys(unittest.TestCase):
         self.ini_data.set("operatingsystem", self.previous_opsystem)
     
     def test_dep_unsatisfied(self):
-        game_deps = {'qwe': {'modulename': 'qwe'}}
+        game_deps = {'qwe': {'module_name': 'qwe'}}
         self.assertRaises(UnavailableDependencyError, check_dependencies,
                           game_deps, self.available_deps)
 
