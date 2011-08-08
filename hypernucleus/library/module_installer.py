@@ -4,7 +4,7 @@ from hypernucleus.model import GAME, DEP
 import urllib.request, urllib.error
 import os
 from os.path import join, basename, exists
-import tarfile
+import zipfile
 import shutil
 
 class ModuleTypeError(Exception):
@@ -26,8 +26,8 @@ class HeadRequest(urllib.request.Request):
 class ModuleInstaller(object):
     path = Paths()
     
-    def __init__(self, moduledata, module_type):
-        self.moduledata = moduledata
+    def __init__(self, url, module_type):
+        self.url = url
         self.module_type = module_type
         if self.module_type is DEP:
             self.extract_path = self.path.dependencies
@@ -35,18 +35,16 @@ class ModuleInstaller(object):
             self.extract_path = self.path.games
         else:
             raise ModuleTypeError()
-
-        self._get_file_info()
     
     def _get_file_info(self):
         """
         Retrieves the name and the size of the file to download
         """
         # Get the filename of the file that we will download
-        self.filename = basename(urlparse(self.moduledata['archiveurl']).path)
+        self.filename = basename(urlparse(self.url).path)
         
         # Get content length header
-        req = HeadRequest(self.moduledata['archiveurl'])
+        req = HeadRequest(self.url)
 #        header_archive = urllib2.urlopen(req)
         try:
             header_archive = urllib.request.urlopen(req)
@@ -63,17 +61,20 @@ class ModuleInstaller(object):
         Download the module archive and extract it to the
         corresponding path
         """
+        # Moved from __init__
+        self._get_file_info()
+        
         # Remove existing file if it exists
         try:
             os.remove(join(self.path.archives, self.filename))
         except OSError:
             pass
-        print(self.filename, self.extract_path)
+        
         # Open the file so we can write to it.
         archivefile = open(join(self.path.archives, self.filename), "a+b")
         
         # Open a normal urllib2 object
-        archive = urllib.request.urlopen(self.moduledata['archiveurl'])
+        archive = urllib.request.urlopen(self.url)
         
         # Download file
         keep_going = True
@@ -92,7 +93,8 @@ class ModuleInstaller(object):
         
         if keep_going:
             # Extract archive
-            tar = tarfile.open(join(self.path.archives, self.filename))
+            tar = zipfile.ZipFile(
+                    open(join(self.path.archives, self.filename), "rb"))
             tar.extractall(self.extract_path)
             tar.close()
         #else:
@@ -106,6 +108,9 @@ class ModuleInstaller(object):
             pass
         
     def get_extract_path(self, module_type):
+        """
+        Find path to game/dep directory
+        """
         if module_type is DEP:
             extract_path = self.path.dependencies
         elif module_type is GAME:

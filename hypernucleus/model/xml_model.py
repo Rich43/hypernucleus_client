@@ -83,8 +83,10 @@ class XmlModel:
         else:
             return itemtwo
 
-    def get_revision_source(self, module_name, revision):
+    def get_revision_source(self, module_name, revision, return_url=False):
         item = self.get_revision(module_name, revision)
+        if return_url:
+            return item.find("source").text
         return urlopen(item.find("source").text)
 
     def get_revision_created(self, module_name, revision):

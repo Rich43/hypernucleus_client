@@ -8,6 +8,7 @@ from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
 from hypernucleus.model.xml_model import XmlModel as Model
+from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED
 from PyQt4.QtGui import QMainWindow
 from PyQt4 import uic, QtCore
@@ -24,13 +25,12 @@ class MainWindow(QMainWindow):
         # Set the window dimensions from config.
         self.ini_mgr = INIManager()
         dimentions = self.ini_mgr.get_window_dimentions()
-        self.setGeometry(QtCore.QRect(dimentions.x, dimentions.y,
+        if dimentions:
+            self.setGeometry(QtCore.QRect(dimentions.x, dimentions.y,
                                       dimentions.width, dimentions.height))
         
         # Fill treeview with content.
-        self.root_items = {GAME: {}, DEP: {}}
-        self.ui.treeGame.setModel(self.configure_model(GAME))
-        self.ui.treeDep.setModel(self.configure_model(DEP))
+        self.reset_models()
         
         # Connect all signals/events
         self.quick_connect("actionExit", "exit")
@@ -49,7 +49,15 @@ class MainWindow(QMainWindow):
         self.connect(getattr(self.ui, action_name), 
                      QtCore.SIGNAL('triggered()'), 
                      self, QtCore.SLOT(method_name + '()'))
-        
+    
+    def reset_models(self):
+        """
+        Reload items in treeview
+        """
+        self.root_items = {GAME: {}, DEP: {}}
+        self.ui.treeGame.setModel(self.configure_model(GAME))
+        self.ui.treeDep.setModel(self.configure_model(DEP))
+    
     def configure_model(self, module_type):
         """
         Add items to a Tree View model.
@@ -68,31 +76,70 @@ class MainWindow(QMainWindow):
         self.root_items[module_type][NOT_INSTALLED] = not_ins
         tree_model.appendChild(not_ins)
         
-        # Populate root items with data.
+        # Populate root items with data, check to see if module is installed.
         m = Model(module_type, self.ini_mgr.get_xml_url())
+        installer = ModuleInstaller(None, module_type)
         for m_name in m.list_module_names():
-            module_item = TreeItem(m.get_display_name(m_name), not_ins)
+            is_installed = installer.is_module_installed(m_name, module_type)
+            if is_installed:
+                tree_item = ins
+            else:
+                tree_item = not_ins
+            module_item = TreeItem(m.get_display_name(m_name), tree_item)
             module_item.tag = m_name
-            not_ins.appendChild(module_item)
+            tree_item.appendChild(module_item)
+        
         # Output the model
         return tree_model
 
-    def get_selected_item(self):
-        ci = self.sender().currentIndex()
+    def get_selected_item(self, treeview=None):
+        """
+        Get currently selected item in treeview
+        """
+        if treeview:
+            ci = treeview.currentIndex()
+        else:
+            ci = self.sender().currentIndex()
         parent_row = ci.parent().row()
         if parent_row > -1:
             item = ci.model().rootItem.child(parent_row).childItems[ci.row()]
             return item
         else:
             return None
-
+    
+    def run_game_dep(self, module_name, module_type):
+        """
+        Run/Install a Game/Dependency
+        """
+        if not module_type in [GAME, DEP]:
+            raise Exception("Invalid module type")
+        if module_type == GAME:
+            m = Model(module_type, self.ini_mgr.get_xml_url())
+            revisions = m.list_revisions(module_name)
+            source_url = m.get_revision_source(module_name, 
+                                               revisions[0], True)
+            installer = ModuleInstaller(source_url, module_type)
+            is_installed = installer.is_module_installed(module_name, 
+                                                         module_type)
+            if is_installed:
+                print("TODO: Run code")
+            else:
+                installer.install()
+                self.reset_models()
+        elif module_type == DEP:
+            print("dep", module_name)
+            
     @QtCore.pyqtSlot()
     def game(self):
-        print(self.get_selected_item().tag)
+        item = self.get_selected_item()
+        if item:
+            self.run_game_dep(item.tag, GAME)
 
     @QtCore.pyqtSlot()
     def dep(self):
-        print(self.get_selected_item().tag)
+        item = self.get_selected_item()
+        if item:
+            self.run_game_dep(item.tag, DEP)
 
     @QtCore.pyqtSlot()
     def exit(self):
@@ -100,7 +147,14 @@ class MainWindow(QMainWindow):
 
     @QtCore.pyqtSlot()
     def run(self):
-        print("Method 'run' executed.")
+        tab_index = self.ui.tabGameDep.currentIndex()
+        if tab_index == 0:
+            item = self.get_selected_item(self.ui.treeGame)
+            if item:
+                self.run_game_dep(item.tag, GAME)
+        elif tab_index == 1:
+            self.run_game_dep(self.get_selected_item(self.ui.treeDep).tag,
+                              DEP)
     
     @QtCore.pyqtSlot()
     def stop(self):

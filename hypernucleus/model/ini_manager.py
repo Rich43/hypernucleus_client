@@ -142,6 +142,10 @@ class INIManager:
         """
         Get window dimentions
         """
+        options = ["x", "y", "width", "height"]
+        for option in options:
+            if not self.conf_file.has_option(PROJNAME, option):
+                return None
         x = self.conf_file.getint(PROJNAME, "x")
         y = self.conf_file.getint(PROJNAME, "y")
         width = self.conf_file.getint(PROJNAME, "width")

@@ -71,11 +71,6 @@ class TestDependencys(unittest.TestCase):
         self.assertRaises(UnavailableDependencyError, check_dependencies,
                           game_deps, self.available_deps)
 
-    def test_dep_unsatisfied(self):
-        game_deps = {'qwe': {'version': 'xx'}}
-        self.assertRaises(UnavailableDependencyError, check_dependencies,
-                          game_deps, self.available_deps)
-
     def test_versions_dont_match(self):
         game_deps = {'foo': {'version': '2.0'}}
         self.assertRaises(UnmatchedDependencyVersionError, check_dependencies,
