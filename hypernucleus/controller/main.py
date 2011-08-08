@@ -11,7 +11,7 @@ from hypernucleus.model.xml_model import XmlModel as Model
 from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED
 from PyQt4.QtGui import QMainWindow
-from PyQt4 import uic, QtCore
+from PyQt4 import uic, QtCore, QtGui
 import sys
 
 class MainWindow(QMainWindow):
@@ -40,6 +40,8 @@ class MainWindow(QMainWindow):
         self.quick_connect("actionSettings", "settings")
         self.ui.treeGame.doubleClicked.connect(self.game)
         self.ui.treeDep.doubleClicked.connect(self.dep)
+        self.ui.treeGame.selectionChanged = self.game_selection_changed
+        self.ui.treeDep.selectionChanged = self.dep_selection_changed
         
     def quick_connect(self, action_name, method_name):
         """
@@ -57,6 +59,8 @@ class MainWindow(QMainWindow):
         self.root_items = {GAME: {}, DEP: {}}
         self.ui.treeGame.setModel(self.configure_model(GAME))
         self.ui.treeDep.setModel(self.configure_model(DEP))
+        self.ui.treeGame.expandAll()
+        self.ui.treeDep.expandAll()
     
     def configure_model(self, module_type):
         """
@@ -129,6 +133,45 @@ class MainWindow(QMainWindow):
         elif module_type == DEP:
             print("dep", module_name)
             
+    def uninstall_game_dep(self, module_name, module_type):
+        """
+        Uninstall a Game/Dependency
+        """
+        installer = ModuleInstaller(None, module_type)
+        is_installed = installer.is_module_installed(module_name, 
+                                                     module_type)
+        if is_installed:
+            installer.uninstall_module(module_name, module_type)
+            self.reset_models()
+    
+    def selection_changed(self, old_selection, new_selection, module_type):
+        if module_type == GAME:
+            tree_view = self.ui.treeGame
+        elif module_type == DEP:
+            tree_view = self.ui.treeDep
+        item = self.get_selected_item(tree_view)
+        if item:
+            m = Model(module_type, self.ini_mgr.get_xml_url())
+            self.ui.projectNameLineEdit.setText(
+                                        m.get_display_name(item.tag))
+            self.ui.pythonModuleNameLineEdit.setText(item.tag)
+            self.ui.projectCreationDateLineEdit.setText(
+                                        m.get_created(item.tag))
+            self.ui.projectDescriptionLineEdit.setText(
+                                        m.get_description(item.tag))
+        return QtGui.QTreeView.selectionChanged(tree_view, old_selection, 
+                                                new_selection)
+            
+    def dep_selection_changed(self, old_selection, new_selection):
+        return self.selection_changed(old_selection, new_selection, DEP)
+    
+    def game_selection_changed(self, old_selection, new_selection):
+        return self.selection_changed(old_selection, new_selection, GAME)
+    
+    @QtCore.pyqtSlot()
+    def test(self):
+        print("woo")
+            
     @QtCore.pyqtSlot()
     def game(self):
         item = self.get_selected_item()
@@ -153,8 +196,9 @@ class MainWindow(QMainWindow):
             if item:
                 self.run_game_dep(item.tag, GAME)
         elif tab_index == 1:
-            self.run_game_dep(self.get_selected_item(self.ui.treeDep).tag,
-                              DEP)
+            item = self.get_selected_item(self.ui.treeDep)
+            if item:
+                self.run_game_dep(item.tag, DEP)
     
     @QtCore.pyqtSlot()
     def stop(self):
@@ -162,7 +206,15 @@ class MainWindow(QMainWindow):
         
     @QtCore.pyqtSlot()
     def uninstall(self):
-        print("Method 'uninstall' executed.")
+        tab_index = self.ui.tabGameDep.currentIndex()
+        if tab_index == 0:
+            item = self.get_selected_item(self.ui.treeGame)
+            if item:
+                self.uninstall_game_dep(item.tag, GAME)
+        elif tab_index == 1:
+            item = self.get_selected_item(self.ui.treeDep)
+            if item:
+                self.uninstall_game_dep(item.tag, DEP)
         
     @QtCore.pyqtSlot()
     def settings(self):
