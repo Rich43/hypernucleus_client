@@ -3,6 +3,9 @@ from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP
 from PyQt4 import QtCore
 
+class InvalidVersion(Exception):
+    pass
+
 class HelperMixin:
     """
     A series of helper functions to make working with PyQt4 easier!
@@ -21,8 +24,10 @@ class HelperMixin:
         """
         Easy helper to expand a node.
         """
-        index = tree_view.model().createIndex(1, 0, tree_item)
-        tree_view.expand(index)
+        indexes = [0, 1]
+        for i in indexes:
+            index = tree_view.model().createIndex(i, 0, tree_item)
+            tree_view.expand(index)
         
     def get_selected_item(self, treeview=None):
         """
@@ -39,17 +44,19 @@ class HelperMixin:
         else:
             return None
     
-    def run_game_dep(self, module_name, module_type):
+    def run_game_dep(self, module_name, revision, module_type):
         """
         Run/Install a Game/Dependency
         """
-        if not module_type in [GAME, DEP]:
-            raise Exception("Invalid module type")
         if module_type == GAME:
             m = Model(module_type, self.ini_mgr.get_xml_url())
             revisions = m.list_revisions(module_name)
+            try:
+                rev_index = revisions.index(revision)
+            except ValueError:
+                raise InvalidVersion
             source_url = m.get_revision_source(module_name, 
-                                               revisions[0], True)
+                                               revisions[rev_index], True)
             installer = ModuleInstaller(source_url, module_type)
             is_installed = installer.is_module_installed(module_name, 
                                                          module_type)
@@ -59,7 +66,7 @@ class HelperMixin:
                 installer.install()
                 self.reset_models()
         elif module_type == DEP:
-            print("dep", module_name)
+            print("dep", module_name, revision)
             
     def uninstall_game_dep(self, module_name, module_type):
         """

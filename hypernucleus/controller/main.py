@@ -140,13 +140,13 @@ class MainWindow(QMainWindow, HelperMixin):
     def game(self):
         item = self.get_selected_item()
         if item:
-            self.run_game_dep(item.tag, GAME)
+            self.run_game_dep(item.tag[0], item.tag[1], GAME)
 
     @QtCore.pyqtSlot()
     def dep(self):
         item = self.get_selected_item()
         if item:
-            self.run_game_dep(item.tag, DEP)
+            self.run_game_dep(item.tag[0], item.tag[1], DEP)
 
     @QtCore.pyqtSlot()
     def exit(self):
@@ -158,11 +158,11 @@ class MainWindow(QMainWindow, HelperMixin):
         if tab_index == 0:
             item = self.get_selected_item(self.ui.treeGame)
             if item:
-                self.run_game_dep(item.tag, GAME)
+                self.run_game_dep(item.tag[0], item.tag[1], GAME)
         elif tab_index == 1:
             item = self.get_selected_item(self.ui.treeDep)
             if item:
-                self.run_game_dep(item.tag, DEP)
+                self.run_game_dep(item.tag[0], item.tag[1], DEP)
     
     @QtCore.pyqtSlot()
     def stop(self):
@@ -174,11 +174,11 @@ class MainWindow(QMainWindow, HelperMixin):
         if tab_index == 0:
             item = self.get_selected_item(self.ui.treeGame)
             if item:
-                self.uninstall_game_dep(item.tag, GAME)
+                self.uninstall_game_dep(item.tag[0], GAME)
         elif tab_index == 1:
             item = self.get_selected_item(self.ui.treeDep)
             if item:
-                self.uninstall_game_dep(item.tag, DEP)
+                self.uninstall_game_dep(item.tag[0], DEP)
         
     @QtCore.pyqtSlot()
     def settings(self):

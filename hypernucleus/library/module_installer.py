@@ -34,7 +34,7 @@ class ModuleInstaller(object):
         elif self.module_type is GAME:
             self.extract_path = self.path.games
         else:
-            raise ModuleTypeError()
+            raise ModuleTypeError
     
     def _get_file_info(self):
         """
