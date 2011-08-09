@@ -52,22 +52,40 @@ class MainWindow(QMainWindow):
                      QtCore.SIGNAL('triggered()'), 
                      self, QtCore.SLOT(method_name + '()'))
     
+    def expand(self, tree_view, tree_item):
+        """
+        Easy helper to expand a node.
+        """
+        index = tree_view.model().createIndex(1, 0, tree_item)
+        tree_view.expand(index)
+    
     def reset_models(self):
         """
         Reload items in treeview
         """
+        # Clear the root items
         self.root_items = {GAME: {}, DEP: {}}
+        
+        # Make new models
         self.ui.treeGame.setModel(self.configure_model(GAME))
         self.ui.treeDep.setModel(self.configure_model(DEP))
-        self.ui.treeGame.expandAll()
-        self.ui.treeDep.expandAll()
-    
+        
+        # Expand relevant nodes.
+        part_one = [(GAME, self.ui.treeGame), (DEP, self.ui.treeDep)]
+        part_two = [INSTALLED, NOT_INSTALLED]
+        for one_key, one_tv in part_one:
+            for two in part_two:
+                self.expand(one_tv, self.root_items[one_key][two])
+        
+        for dummy, one_tv in part_one:
+            one_tv.resizeColumnToContents(0)
+            
     def configure_model(self, module_type):
         """
         Add items to a Tree View model.
         """
         # Make the title bar.
-        tree_model = TreeModel("")
+        tree_model = TreeModel(["Name", "Installed Version"])
         root_item = tree_model.rootItem
         
         # Add Installed root item
@@ -84,13 +102,18 @@ class MainWindow(QMainWindow):
         m = Model(module_type, self.ini_mgr.get_xml_url())
         installer = ModuleInstaller(None, module_type)
         for m_name in m.list_module_names():
+            rev_list = m.list_revisions(m_name)
             is_installed = installer.is_module_installed(m_name, module_type)
             if is_installed:
                 tree_item = ins
             else:
                 tree_item = not_ins
             module_item = TreeItem(m.get_display_name(m_name), tree_item)
-            module_item.tag = m_name
+            module_item.tag = (m_name, rev_list[0])
+            for rev in rev_list:
+                rev_item = TreeItem(str(rev), module_item)
+                rev_item.tag = (m_name, rev)
+                module_item.appendChild(rev_item)
             tree_item.appendChild(module_item)
         
         # Output the model
@@ -150,15 +173,21 @@ class MainWindow(QMainWindow):
         elif module_type == DEP:
             tree_view = self.ui.treeDep
         item = self.get_selected_item(tree_view)
+        installer = ModuleInstaller(None, module_type)
         if item:
+            m_name = item.tag[0]
             m = Model(module_type, self.ini_mgr.get_xml_url())
             self.ui.projectNameLineEdit.setText(
-                                        m.get_display_name(item.tag))
-            self.ui.pythonModuleNameLineEdit.setText(item.tag)
+                                        m.get_display_name(m_name))
+            self.ui.pythonModuleNameLineEdit.setText(m_name)
             self.ui.projectCreationDateLineEdit.setText(
-                                        m.get_created(item.tag))
+                                        m.get_created(m_name))
             self.ui.projectDescriptionLineEdit.setText(
-                                        m.get_description(item.tag))
+                                        m.get_description(m_name))
+            if installer.is_module_installed(m_name, module_type):
+                pass
+            else:
+                self.ui.installedVersionLineEdit.setText(NOT_INSTALLED)
         return QtGui.QTreeView.selectionChanged(tree_view, old_selection, 
                                                 new_selection)
             
