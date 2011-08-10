@@ -12,6 +12,7 @@ from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
                                 INSTALLED_VERSION)
 from hypernucleus.controller.helper_mixin import HelperMixin
+from hypernucleus.controller.settings import SettingsDialog
 from PyQt4.QtGui import QMainWindow
 from PyQt4 import uic, QtCore, QtGui
 import sys
@@ -188,7 +189,8 @@ class MainWindow(QMainWindow, HelperMixin):
         
     @QtCore.pyqtSlot()
     def settings(self):
-        print("Method 'settings' executed.")
+        settings = SettingsDialog()
+        settings.show()
         
     def resizeEvent(self, event):
         self.move_resize()
