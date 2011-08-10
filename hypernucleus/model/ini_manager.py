@@ -19,6 +19,7 @@ from hypernucleus.library.paths import Paths, PROJNAME
 from os.path import exists
 from os import makedirs
 from configparser import ConfigParser, NoOptionError
+from hypernucleus.model import INSTALLED_VERSION
 
 class WindowDimentions:
     """
@@ -63,6 +64,7 @@ class INIManager:
             # Make config file
             self.conf_file.add_section(PROJNAME)
             self.conf_file.set(PROJNAME, "xmlurl", self.default_url)
+            self.conf_file.add_section(INSTALLED_VERSION)
             self.save()
         
         self.conf_file.read(p.ini_path)
@@ -165,3 +167,16 @@ class INIManager:
         self.conf_file.set(PROJNAME, "height", 
                            str(window_dimentions_obj.height))
         self.save()
+        
+    def set_installed_version(self, module_name, version):
+        self.conf_file.set(INSTALLED_VERSION, module_name, str(version))
+        self.save()
+        
+    def get_installed_version(self, module_name):
+        try:
+            return self.conf_file.getfloat(INSTALLED_VERSION, module_name)
+        except NoOptionError:
+            return None
+        
+    def delete_installed_version(self, module_name):
+        self.conf_file.remove_option(INSTALLED_VERSION, module_name)

@@ -37,10 +37,8 @@ class HelperMixin:
             ci = treeview.currentIndex()
         else:
             ci = self.sender().currentIndex()
-        parent_row = ci.parent().row()
-        if parent_row > -1:
-            item = ci.model().rootItem.child(parent_row).childItems[ci.row()]
-            return item
+        if ci.parent().row() > -1:
+            return ci.internalPointer()
         else:
             return None
     
@@ -64,7 +62,11 @@ class HelperMixin:
                 print("TODO: Run code")
             else:
                 installer.install()
+                self.ini_mgr.set_installed_version(module_name, 
+                                                   revisions[rev_index])
                 self.reset_models()
+                print("TODO: Run code")
+                
         elif module_type == DEP:
             print("dep", module_name, revision)
             
@@ -77,4 +79,5 @@ class HelperMixin:
                                                      module_type)
         if is_installed:
             installer.uninstall_module(module_name, module_type)
+            self.ini_mgr.delete_installed_version(module_name)
             self.reset_models()

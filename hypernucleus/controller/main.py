@@ -9,7 +9,8 @@ from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
 from hypernucleus.model.xml_model import XmlModel as Model
 from hypernucleus.library.module_installer import ModuleInstaller
-from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED
+from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
+                                INSTALLED_VERSION)
 from hypernucleus.controller.helper_mixin import HelperMixin
 from PyQt4.QtGui import QMainWindow
 from PyQt4 import uic, QtCore, QtGui
@@ -50,9 +51,9 @@ class MainWindow(QMainWindow, HelperMixin):
         """
         Reload items in treeview
         """
-        # Clear the root items
+        # Clear the root/child items
         self.root_items = {GAME: {}, DEP: {}}
-        
+
         # Make new models
         self.ui.treeGame.setModel(self.configure_model(GAME))
         self.ui.treeDep.setModel(self.configure_model(DEP))
@@ -72,16 +73,16 @@ class MainWindow(QMainWindow, HelperMixin):
         Add items to a Tree View model.
         """
         # Make the title bar.
-        tree_model = TreeModel(["Name", "Installed Version"])
+        tree_model = TreeModel(["Name", INSTALLED_VERSION])
         root_item = tree_model.rootItem
         
         # Add Installed root item
-        ins = TreeItem(INSTALLED, root_item)
+        ins = TreeItem([INSTALLED, ''], root_item)
         self.root_items[module_type][INSTALLED] = ins
         tree_model.appendChild(ins)
         
         # Add Not Installed root item
-        not_ins = TreeItem(NOT_INSTALLED, root_item)
+        not_ins = TreeItem([NOT_INSTALLED, ''], root_item)
         self.root_items[module_type][NOT_INSTALLED] = not_ins
         tree_model.appendChild(not_ins)
         
@@ -93,9 +94,13 @@ class MainWindow(QMainWindow, HelperMixin):
             is_installed = installer.is_module_installed(m_name, module_type)
             if is_installed:
                 tree_item = ins
+                installed_version = str(self.ini_mgr.get_installed_version(
+                                                                    m_name))
             else:
                 tree_item = not_ins
-            module_item = TreeItem(m.get_display_name(m_name), tree_item)
+                installed_version = ''
+            module_item = TreeItem([m.get_display_name(m_name), 
+                                    installed_version], tree_item)
             module_item.tag = (m_name, rev_list[0])
             for rev in rev_list:
                 rev_item = TreeItem(str(rev), module_item)
@@ -124,7 +129,8 @@ class MainWindow(QMainWindow, HelperMixin):
             self.ui.projectDescriptionLineEdit.setText(
                                         m.get_description(m_name))
             if installer.is_module_installed(m_name, module_type):
-                pass
+                i_version = str(self.ini_mgr.get_installed_version(m_name))
+                self.ui.installedVersionLineEdit.setText(i_version)
             else:
                 self.ui.installedVersionLineEdit.setText(NOT_INSTALLED)
         return QtGui.QTreeView.selectionChanged(tree_view, old_selection, 
