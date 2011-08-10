@@ -25,14 +25,20 @@ class XmlModel:
             self.type = GAME
         elif game_or_dep == DEP:
             self.type = DEP
+        elif game_or_dep == None:
+            self.type = None
         else:
             raise InvalidGameDepType
     
     def list_module_names(self):
+        if not self.type:
+            raise Exception("None is intended for listing OS/Arch only.")
         item = self.etree.findall(self.type)
         return [x.find("name").text for x in item]
     
     def get_module_name(self, name):
+        if not self.type:
+            raise Exception("None is intended for listing OS/Arch only.")
         name = quoteattr(name)
         item = self.etree.find(self.type + "[name=%s]" % name)
         if not len(item):
@@ -107,7 +113,22 @@ class XmlModel:
                            binary.find("architecture").text))
         return result
     
+    def list_operating_systems(self):
+        item = self.etree.findall("operatingsystem")
+        result = []
+        for os in item:
+            result.append((os.find("name").text,
+                           os.find("display_name").text))
+        return result
 
+    def list_architectures(self):
+        item = self.etree.findall("architecture")
+        result = []
+        for arch in item:
+            result.append((arch.find("name").text,
+                           arch.find("display_name").text))
+        return result
+    
 """
 x = XmlModel(GAME, "http://hypernucleus.pynguins.com/outputs/xml")
 name = "anotherball"

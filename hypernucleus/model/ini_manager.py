@@ -36,7 +36,7 @@ class INIManager:
     Manages hypernucleus's INI File
     """
     default_url = "http://hypernucleus.pynguins.com/outputs/xml"
-    default_multi = 1
+    default_picture_width = 200
     default_arch = "i386"
     conf_file = None
     ini_path = None
@@ -92,20 +92,20 @@ class INIManager:
         self.conf_file.set(PROJNAME, "xmlurl", url)
         self.save()
         
-    def get_multiplier(self):
+    def get_picture_width(self):
         """
-        Get multiplier
+        Get picture width
         """
         try:
-            return self.conf_file.getint(PROJNAME, "multiplier")
+            return self.conf_file.getint(PROJNAME, "picture_width")
         except NoOptionError:
-            return self.default_multi
+            return self.default_picture_width
         
-    def set_multiplier(self, multiplier):
+    def set_picture_width(self, picture_width):
         """
-        Set multiplier
+        Set picture width
         """
-        self.conf_file.set(PROJNAME, "multiplier", str(multiplier))
+        self.conf_file.set(PROJNAME, "picture_width", str(picture_width))
         self.save()
     
     def get_architecture(self):
@@ -131,7 +131,7 @@ class INIManager:
         try:
             return self.conf_file.get(PROJNAME, "operating_system")
         except NoOptionError:
-            return self.__detect_os()
+            return None
         
     def set_operating_system(self, operating_system):
         """
