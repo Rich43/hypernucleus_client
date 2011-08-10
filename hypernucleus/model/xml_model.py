@@ -97,26 +97,16 @@ class XmlModel:
         item = self.get_revision(module_name, revision)
         return item.find("moduletype").text
     
-    """
-    def load(self):
-        item_id = 0
-        for item in self.etree.findall("game"):
-            # Put XML attributes into a dictionary
-            try:
-                attribs = ["name", "version", "description", "picture",
-                "archiveurl", "module_name", "module_type", "author"]
-                result = {}
-                for attrib in attribs:
-                    result[attrib] = item.find(attrib).text
-            except AttributeError:
-                # Bad XML Schema
-                return False
-            
-            # Put Dictionary in a list
-            self.data[item_id] = result
-            item_id += 1
-        return True
-    """
+    def list_revision_binaries(self, module_name, revision):
+        item = self.get_revision(module_name, revision)
+        itemtwo = item.findall("binary")
+        result = []
+        for binary in itemtwo:
+            result.append((binary.find("binary").text,
+                           binary.find("operating_system").text,
+                           binary.find("architecture").text))
+        return result
+    
 
 """
 x = XmlModel(GAME, "http://hypernucleus.pynguins.com/outputs/xml")
