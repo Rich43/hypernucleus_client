@@ -1,7 +1,7 @@
 from hypernucleus.model import GAME, DEP
 from urllib.request import urlopen
-from urllib.error import URLError
-from xml.etree.ElementTree import ElementTree
+from urllib.error import URLError, HTTPError
+from xml.etree.ElementTree import ElementTree, ParseError
 from xml.sax.saxutils import quoteattr
 
 class InvalidGameDepType(Exception):
@@ -13,14 +13,29 @@ class ModuleNameNotFound(Exception):
 class RevisionNotFound(Exception):
     pass
 
+class InvalidURL(Exception):
+    pass
+
 class XmlModel:
     """
     An XML data model
     """
     
     def __init__(self, game_or_dep, url):
-        self.file = urlopen(url)
-        self.etree = ElementTree(file=self.file)
+        try:
+            self.file = urlopen(url)
+        except HTTPError as e:
+            raise InvalidURL(e)
+        except URLError as e:
+            raise InvalidURL(e)
+        except ValueError as e:
+            raise InvalidURL(e)
+        
+        try:
+            self.etree = ElementTree(file=self.file)
+        except ParseError as e:
+            raise InvalidURL(e)
+        
         if game_or_dep == GAME:
             self.type = GAME
         elif game_or_dep == DEP:

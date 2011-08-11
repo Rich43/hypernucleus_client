@@ -37,7 +37,6 @@ class INIManager:
     """
     default_url = "http://hypernucleus.pynguins.com/outputs/xml"
     default_picture_width = 200
-    default_arch = "i386"
     conf_file = None
     ini_path = None
     
@@ -115,7 +114,7 @@ class INIManager:
         try:
             return self.conf_file.get(PROJNAME, "architecture")
         except NoOptionError:
-            return self.default_arch
+            return None
         
     def set_architecture(self, architecture):
         """
