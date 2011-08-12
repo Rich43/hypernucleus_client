@@ -83,6 +83,15 @@ class XmlModel:
                 pass
         return result
     
+    def list_dependencies(self, module_name):
+        result = []
+        item = self.get_module_name(module_name)
+        itemtwo = item.findall("dependency")
+        for dep in itemtwo:
+            result.append((dep.find("name").text,
+                           float(dep.find("version").text)))
+        return result
+    
     def list_revisions(self, module_name):
         """
         Return sorted list of revisions.

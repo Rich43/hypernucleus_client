@@ -52,6 +52,10 @@ class MainWindow(QMainWindow, HelperMixin):
         """
         Reload items in treeview
         """
+        # Reset dependency model
+        list_model = TreeModel(["Name", "Version"])
+        self.ui.dependenciesTreeView.setModel(list_model)
+        
         # Clear the root/child items
         self.root_items = {GAME: {}, DEP: {}}
 
@@ -134,6 +138,12 @@ class MainWindow(QMainWindow, HelperMixin):
                 self.ui.installedVersionLineEdit.setText(i_version)
             else:
                 self.ui.installedVersionLineEdit.setText(NOT_INSTALLED)
+            list_model = TreeModel(["Name", "Version"])
+            root_item = list_model.rootItem
+            for dep in m.list_dependencies(m_name):
+                list_model.appendChild(TreeItem([dep[0], str(dep[1])], 
+                                                root_item))
+            self.ui.dependenciesTreeView.setModel(list_model)
         return QtGui.QTreeView.selectionChanged(tree_view, old_selection, 
                                                 new_selection)
             
