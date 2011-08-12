@@ -50,15 +50,9 @@ class HelperMixin:
         """
         Run/Install a Game/Dependency
         """
+        m = Model(module_type, self.ini_mgr.get_xml_url())
         if module_type == GAME:
-            m = Model(module_type, self.ini_mgr.get_xml_url())
-            revisions = m.list_revisions(module_name)
-            try:
-                rev_index = revisions.index(revision)
-            except ValueError:
-                raise InvalidVersion
-            source_url = m.get_revision_source(module_name, 
-                                               revisions[rev_index], True)
+            source_url = m.get_revision_source(module_name, revision, True)
             installer = ModuleInstaller(source_url, module_type)
             is_installed = installer.is_module_installed(module_name, 
                                                          module_type)
@@ -66,18 +60,11 @@ class HelperMixin:
                 print("TODO: Run code")
             else:
                 installer.install()
-                self.ini_mgr.set_installed_version(module_name, 
-                                                   revisions[rev_index])
+                self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
                 print("TODO: Run code")
                 
         elif module_type == DEP:
-            m = Model(module_type, self.ini_mgr.get_xml_url())
-            revisions = m.list_revisions(module_name)
-            try:
-                rev_index = revisions.index(revision)
-            except ValueError:
-                raise InvalidVersion
             os = self.ini_mgr.get_operating_system()
             arch = self.ini_mgr.get_architecture()
             binaries = m.list_revision_binaries(module_name, revision)
@@ -94,8 +81,7 @@ class HelperMixin:
                                                          module_type)
             if not is_installed:
                 installer.install()
-                self.ini_mgr.set_installed_version(module_name, 
-                                                   revisions[rev_index])
+                self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
                 
     def uninstall_game_dep(self, module_name, module_type):
