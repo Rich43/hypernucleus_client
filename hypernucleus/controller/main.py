@@ -7,7 +7,7 @@ Created on 23 Jul 2011
 from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
-from hypernucleus.model.xml_model import XmlModel as Model, InvalidURL
+from hypernucleus.model.xml_model import XmlModel as Model
 from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
                                 INSTALLED_VERSION)

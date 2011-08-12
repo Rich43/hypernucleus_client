@@ -1,9 +1,13 @@
 from hypernucleus.model.xml_model import XmlModel as Model
 from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP
+#from hypernucleus.controller.main import MainWindow
 from PyQt4 import QtCore
 
 class InvalidVersion(Exception):
+    pass
+
+class BinaryNotFound(Exception):
     pass
 
 class HelperMixin:
@@ -68,8 +72,32 @@ class HelperMixin:
                 print("TODO: Run code")
                 
         elif module_type == DEP:
-            print("dep", module_name, revision)
-            
+            m = Model(module_type, self.ini_mgr.get_xml_url())
+            revisions = m.list_revisions(module_name)
+            try:
+                rev_index = revisions.index(revision)
+            except ValueError:
+                raise InvalidVersion
+            os = self.ini_mgr.get_operating_system()
+            arch = self.ini_mgr.get_architecture()
+            binaries = m.list_revision_binaries(module_name, revision)
+            source_url = None
+            for binary in binaries:
+                if (os == binary[1] and arch == binary[2] or 
+                    binary[1] == "pi" and binary[2] == "pi"):
+                    source_url = binary[0]
+                    break
+            if not source_url:
+                raise BinaryNotFound
+            installer = ModuleInstaller(source_url, module_type)
+            is_installed = installer.is_module_installed(module_name, 
+                                                         module_type)
+            if not is_installed:
+                installer.install()
+                self.ini_mgr.set_installed_version(module_name, 
+                                                   revisions[rev_index])
+                self.reset_models()
+                
     def uninstall_game_dep(self, module_name, module_type):
         """
         Uninstall a Game/Dependency
