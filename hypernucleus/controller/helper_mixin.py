@@ -50,7 +50,22 @@ class HelperMixin:
         """
         Run/Install a Game/Dependency
         """
+        source_url = None
+        
+        # Get needed data from model
         m = Model(module_type, self.ini_mgr.get_xml_url())
+        binaries = m.list_revision_binaries(module_name, revision)
+        dependencies = m.list_dependencies(module_name)
+        
+        # Get some data from INI File
+        installed_ver = self.ini_mgr.get_installed_version(module_name)
+        os = self.ini_mgr.get_operating_system()
+        arch = self.ini_mgr.get_architecture()
+        
+        # Install dependencies
+        for m_name, ver in dependencies:
+            self.run_game_dep(m_name, ver, DEP)
+        
         if module_type == GAME:
             source_url = m.get_revision_source(module_name, revision, True)
             installer = ModuleInstaller(source_url, module_type)
@@ -59,16 +74,14 @@ class HelperMixin:
             if is_installed:
                 print("TODO: Run code")
             else:
+                
                 installer.install()
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
                 print("TODO: Run code")
                 
         elif module_type == DEP:
-            os = self.ini_mgr.get_operating_system()
-            arch = self.ini_mgr.get_architecture()
-            binaries = m.list_revision_binaries(module_name, revision)
-            source_url = None
+            # Find the source_url
             for binary in binaries:
                 if (os == binary[1] and arch == binary[2] or 
                     binary[1] == "pi" and binary[2] == "pi"):
@@ -76,13 +89,24 @@ class HelperMixin:
                     break
             if not source_url:
                 raise BinaryNotFound
+            
+            # Figure if source_url module is installed
             installer = ModuleInstaller(source_url, module_type)
             is_installed = installer.is_module_installed(module_name, 
                                                          module_type)
+            
+            # If it isn't installed, install it.
             if not is_installed:
                 installer.install()
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
+                return
+            
+            # If the version does not match with the installed version,
+            # Remove the current version and install new one.
+            if is_installed and installed_ver != revision:
+                self.uninstall_game_dep(module_name, module_type)
+                self.run_game_dep(module_name, revision, module_type)
                 
     def uninstall_game_dep(self, module_name, module_type):
         """

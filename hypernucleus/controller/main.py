@@ -45,6 +45,7 @@ class MainWindow(QMainWindow, HelperMixin):
         self.quick_connect("actionSettings", "settings")
         self.ui.treeGame.doubleClicked.connect(self.game)
         self.ui.treeDep.doubleClicked.connect(self.dep)
+        self.ui.tabGameDep.currentChanged.connect(self.tab_changed)
         self.ui.treeGame.selectionChanged = self.game_selection_changed
         self.ui.treeDep.selectionChanged = self.dep_selection_changed
         
@@ -165,23 +166,36 @@ class MainWindow(QMainWindow, HelperMixin):
                 list_model.appendChild(TreeItem([dep[0], str(dep[1])], 
                                                 root_item))
             self.ui.dependenciesTreeView.setModel(list_model)
-        
-        # Act like nothing ever happened :)
-        return QtGui.QTreeView.selectionChanged(tree_view, old_selection, 
-                                                new_selection)
             
     def dep_selection_changed(self, old_selection, new_selection):
         """
         Dependency selection changed, call above function.
         """
-        return self.selection_changed(old_selection, new_selection, DEP)
+        self.selection_changed(old_selection, new_selection, DEP)
+        return QtGui.QTreeView.selectionChanged(self.ui.treeDep, 
+                                                old_selection, 
+                                                new_selection)
     
     def game_selection_changed(self, old_selection, new_selection):
         """
         Game selection changed, call above function.
         """
-        return self.selection_changed(old_selection, new_selection, GAME)
+        self.selection_changed(old_selection, new_selection, GAME)
+        return QtGui.QTreeView.selectionChanged(self.ui.treeGame, 
+                                                old_selection, 
+                                                new_selection)
         
+    @QtCore.pyqtSlot()
+    def tab_changed(self):
+        """
+        User clicked another tab, refresh selection information.
+        """
+        tab_index = self.ui.tabGameDep.currentIndex()
+        if tab_index == 0:
+            self.selection_changed(tab_index, tab_index, GAME)
+        elif tab_index == 1:
+            self.selection_changed(tab_index, tab_index, DEP)
+            
     @QtCore.pyqtSlot()
     def game(self):
         """
