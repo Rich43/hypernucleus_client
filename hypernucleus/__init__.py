@@ -33,7 +33,7 @@ def main():
     # Check to make sure config is set correctly.
     ini_mgr = INIManager()
     try:
-        Model(None, ini_mgr.get_xml_url())
+        m = Model(ini_mgr.get_xml_url())
     except InvalidURL:
         settings = SettingsDialog()
         QMessageBox.critical(settings,"Invalid Repository URL", INVALID_REPO)
@@ -49,6 +49,6 @@ def main():
             QMessageBox.critical(settings,"Exiting...", INVALID_OS_ARCH_FAIL)
             sys.exit()
     # Open the main window.
-    main_window = MainWindow()
+    main_window = MainWindow(app, m)
     main_window.show()
     sys.exit(app.exec_())

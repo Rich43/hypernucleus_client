@@ -53,6 +53,7 @@ class ModuleInstaller(object):
             raise DownloadError(message)
         headers = dict(header_archive.headers)
         # TODO: what to do if 'content-length' is not specified?
+        headers = {k.lower(): v for k, v in headers.items()}
         self.filesize = headers.get('content-length', -1)
         header_archive.close()
         
@@ -80,13 +81,14 @@ class ModuleInstaller(object):
         keep_going = True
         current_pos = 0
         while keep_going:
-            chunk = archive.read(1024)
+            chunk = archive.read(8192)
             chunk_size = len(chunk)
             if chunk_size == 0:
                 break
             current_pos += chunk_size
             archivefile.write(chunk)
-            # TODO: Add QT4 progress bar
+            yield (int(current_pos), int(self.filesize))
+            
         # Clean up.
         archivefile.close()
         archive.close()
@@ -97,10 +99,7 @@ class ModuleInstaller(object):
                     open(join(self.path.archives, self.filename), "rb"))
             tar.extractall(self.extract_path)
             tar.close()
-        #else:
-        #    # Kill dialog if Cancel Pressed
-        #    progress_dlg.Destroy()
-        
+            
         # Remove archive to save disk space.
         try:
             os.remove(join(self.path.archives, self.filename))

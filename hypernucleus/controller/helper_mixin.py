@@ -53,9 +53,9 @@ class HelperMixin:
         source_url = None
         
         # Get needed data from model
-        m = Model(module_type, self.ini_mgr.get_xml_url())
-        binaries = m.list_revision_binaries(module_name, revision)
-        dependencies = m.list_dependencies(module_name)
+        binaries = self.m.list_revision_binaries(module_name, module_type, 
+                                            revision)
+        dependencies = self.m.list_dependencies(module_name, module_type)
         
         # Get some data from INI File
         installed_ver = self.ini_mgr.get_installed_version(module_name)
@@ -64,18 +64,21 @@ class HelperMixin:
         
         # Install dependencies
         for m_name, ver in dependencies:
-            self.run_game_dep(m_name, ver, DEP)
+            for mo, r, c, l in self.run_game_dep(m_name, ver, DEP):
+                yield (mo, r, c, l)
         
         if module_type == GAME:
-            source_url = m.get_revision_source(module_name, revision, True)
+            source_url = self.m.get_revision_source(module_name, 
+                                                    module_type, 
+                                                    revision, True)
             installer = ModuleInstaller(source_url, module_type)
             is_installed = installer.is_module_installed(module_name, 
                                                          module_type)
             if is_installed:
                 print("TODO: Run code")
             else:
-                
-                installer.install()
+                for cur, length in installer.install():
+                    yield (module_name, revision, cur, length)
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
                 print("TODO: Run code")
@@ -97,7 +100,8 @@ class HelperMixin:
             
             # If it isn't installed, install it.
             if not is_installed:
-                installer.install()
+                for cur, length in installer.install():
+                    yield (module_name, revision, cur, length)
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
                 return
@@ -106,7 +110,9 @@ class HelperMixin:
             # Remove the current version and install new one.
             if is_installed and installed_ver != revision:
                 self.uninstall_game_dep(module_name, module_type)
-                self.run_game_dep(module_name, revision, module_type)
+                for mo, r, c, l in self.run_game_dep(module_name, 
+                                                    revision, module_type):
+                    yield (mo, r, c, l)
                 
     def uninstall_game_dep(self, module_name, module_type):
         """

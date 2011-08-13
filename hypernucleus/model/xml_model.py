@@ -21,7 +21,7 @@ class XmlModel:
     An XML data model
     """
     
-    def __init__(self, game_or_dep, url):
+    def __init__(self, url):
         try:
             self.file = urlopen(url)
         except HTTPError as e:
@@ -35,46 +35,41 @@ class XmlModel:
             self.etree = ElementTree(file=self.file)
         except ParseError as e:
             raise InvalidURL(e)
-        
-        if game_or_dep == GAME:
-            self.type = GAME
-        elif game_or_dep == DEP:
-            self.type = DEP
-        elif game_or_dep == None:
-            self.type = None
-        else:
+
+    def valid_type(self, module_type, none_allowed=True):
+        if not none_allowed and module_type == None:
+            raise InvalidGameDepType
+        if not module_type in [GAME, DEP, None]:
             raise InvalidGameDepType
     
-    def list_module_names(self):
-        if not self.type:
-            raise Exception("None is intended for listing OS/Arch only.")
-        item = self.etree.findall(self.type)
+    def list_module_names(self, module_type):
+        self.valid_type(module_type, False)
+        item = self.etree.findall(module_type)
         return [x.find("name").text for x in item]
     
-    def get_module_name(self, name):
-        if not self.type:
-            raise Exception("None is intended for listing OS/Arch only.")
+    def get_module_name(self, name, module_type):
+        self.valid_type(module_type, False)
         name = quoteattr(name)
-        item = self.etree.find(self.type + "[name=%s]" % name)
+        item = self.etree.find(module_type + "[name=%s]" % name)
         if not len(item):
             raise ModuleNameNotFound
         else:
             return item
     
-    def get_display_name(self, module_name):
-        item = self.get_module_name(module_name)
+    def get_display_name(self, module_name, module_type):
+        item = self.get_module_name(module_name, module_type)
         return item.find("display_name").text
 
-    def get_description(self, module_name):
-        item = self.get_module_name(module_name)
+    def get_description(self, module_name, module_type):
+        item = self.get_module_name(module_name, module_type)
         return item.find("description").text
 
-    def get_created(self, module_name):
-        item = self.get_module_name(module_name)
+    def get_created(self, module_name, module_type):
+        item = self.get_module_name(module_name, module_type)
         return item.find("created").text
     
-    def get_pictures(self, module_name):
-        item = self.get_module_name(module_name)
+    def get_pictures(self, module_name, module_type):
+        item = self.get_module_name(module_name, module_type)
         result = []
         for x in item.findall("picture"):
             try:
@@ -83,29 +78,29 @@ class XmlModel:
                 pass
         return result
     
-    def list_dependencies(self, module_name):
+    def list_dependencies(self, module_name, module_type):
         result = []
-        item = self.get_module_name(module_name)
+        item = self.get_module_name(module_name, module_type)
         itemtwo = item.findall("dependency")
         for dep in itemtwo:
             result.append((dep.find("name").text,
                            float(dep.find("version").text)))
         return result
     
-    def list_revisions(self, module_name):
+    def list_revisions(self, module_name, module_type):
         """
         Return sorted list of revisions.
         Biggest number first.
         """
-        item = self.get_module_name(module_name)
+        item = self.get_module_name(module_name, module_type)
         itemtwo = item.findall("revision")
         result = [float(x.find("version").text) for x in itemtwo]
         result.sort(reverse=True)
         return result
     
-    def get_revision(self, module_name, revision):
+    def get_revision(self, module_name, module_type, revision):
         revision = str(revision)
-        item = self.get_module_name(module_name)
+        item = self.get_module_name(module_name, module_type)
         name = quoteattr(revision)
         itemtwo = item.find("revision[version=%s]" % name)
         if not len(itemtwo):
@@ -113,22 +108,23 @@ class XmlModel:
         else:
             return itemtwo
 
-    def get_revision_source(self, module_name, revision, return_url=False):
-        item = self.get_revision(module_name, revision)
+    def get_revision_source(self, module_name, module_type, revision, 
+                            return_url=False):
+        item = self.get_revision(module_name, module_type, revision)
         if return_url:
             return item.find("source").text
         return urlopen(item.find("source").text)
 
-    def get_revision_created(self, module_name, revision):
-        item = self.get_revision(module_name, revision)
+    def get_revision_created(self, module_name, module_type, revision):
+        item = self.get_revision(module_name, module_type, revision)
         return item.find("created").text
 
-    def get_revision_module_type(self, module_name, revision):
-        item = self.get_revision(module_name, revision)
+    def get_revision_module_type(self, module_name, module_type, revision):
+        item = self.get_revision(module_name, module_type, revision)
         return item.find("moduletype").text
     
-    def list_revision_binaries(self, module_name, revision):
-        item = self.get_revision(module_name, revision)
+    def list_revision_binaries(self, module_name, module_type, revision):
+        item = self.get_revision(module_name, module_type, revision)
         itemtwo = item.findall("binary")
         result = []
         for binary in itemtwo:

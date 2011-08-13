@@ -7,14 +7,13 @@ Created on 23 Jul 2011
 from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
-from hypernucleus.model.xml_model import XmlModel as Model
 from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
                                 INSTALLED_VERSION)
 from hypernucleus.controller.helper_mixin import HelperMixin
 from hypernucleus.controller.settings import SettingsDialog
-from PyQt4.QtGui import QMainWindow
-from PyQt4 import uic, QtCore, QtGui
+from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog
+from PyQt4 import uic, QtCore
 import sys
 
 class MainWindow(QMainWindow, HelperMixin):
@@ -22,8 +21,10 @@ class MainWindow(QMainWindow, HelperMixin):
     The Main Window.
     """
     
-    def __init__(self):
+    def __init__(self, app, m):
         QMainWindow.__init__(self)
+        self.app = app
+        self.m = m
         self.ui = uic.loadUi(main_path, self)
         
         # Set the window dimensions from config.
@@ -93,10 +94,9 @@ class MainWindow(QMainWindow, HelperMixin):
         tree_model.appendChild(not_ins)
         
         # Populate root items with data, check to see if module is installed.
-        m = Model(module_type, self.ini_mgr.get_xml_url())
         installer = ModuleInstaller(None, module_type)
-        for m_name in m.list_module_names():
-            rev_list = m.list_revisions(m_name)
+        for m_name in self.m.list_module_names(module_type):
+            rev_list = self.m.list_revisions(m_name, module_type)
             is_installed = installer.is_module_installed(m_name, module_type)
             if is_installed:
                 tree_item = ins
@@ -105,7 +105,8 @@ class MainWindow(QMainWindow, HelperMixin):
             else:
                 tree_item = not_ins
                 installed_version = ''
-            module_item = TreeItem([m.get_display_name(m_name), 
+            module_item = TreeItem([self.m.get_display_name(m_name, 
+                                                            module_type), 
                                     installed_version], tree_item)
             module_item.tag = (m_name, rev_list[0])
             for rev in rev_list:
@@ -138,17 +139,14 @@ class MainWindow(QMainWindow, HelperMixin):
             # Get the module name from selected item's tag
             m_name = item.tag[0]
             
-            # Initialise the model class
-            m = Model(module_type, self.ini_mgr.get_xml_url())
-            
             # Populate the text boxes with data
             self.ui.projectNameLineEdit.setText(
-                                        m.get_display_name(m_name))
+                                self.m.get_display_name(m_name, module_type))
             self.ui.pythonModuleNameLineEdit.setText(m_name)
             self.ui.projectCreationDateLineEdit.setText(
-                                        m.get_created(m_name))
+                                self.m.get_created(m_name, module_type))
             self.ui.projectDescriptionLineEdit.setText(
-                                        m.get_description(m_name))
+                                self.m.get_description(m_name, module_type))
             
             # Check to see if module is installed and
             # show the installed version if it is.
@@ -162,7 +160,7 @@ class MainWindow(QMainWindow, HelperMixin):
             # display them in the treeview.
             list_model = TreeModel(["Name", "Version"])
             root_item = list_model.rootItem
-            for dep in m.list_dependencies(m_name):
+            for dep in self.m.list_dependencies(m_name, module_type):
                 list_model.appendChild(TreeItem([dep[0], str(dep[1])], 
                                                 root_item))
             self.ui.dependenciesTreeView.setModel(list_model)
@@ -172,7 +170,7 @@ class MainWindow(QMainWindow, HelperMixin):
         Dependency selection changed, call above function.
         """
         self.selection_changed(old_selection, new_selection, DEP)
-        return QtGui.QTreeView.selectionChanged(self.ui.treeDep, 
+        return QTreeView.selectionChanged(self.ui.treeDep, 
                                                 old_selection, 
                                                 new_selection)
     
@@ -181,7 +179,7 @@ class MainWindow(QMainWindow, HelperMixin):
         Game selection changed, call above function.
         """
         self.selection_changed(old_selection, new_selection, GAME)
-        return QtGui.QTreeView.selectionChanged(self.ui.treeGame, 
+        return QTreeView.selectionChanged(self.ui.treeGame, 
                                                 old_selection, 
                                                 new_selection)
         
@@ -195,25 +193,44 @@ class MainWindow(QMainWindow, HelperMixin):
             self.selection_changed(tab_index, tab_index, GAME)
         elif tab_index == 1:
             self.selection_changed(tab_index, tab_index, DEP)
+    
+    def run_game_dep_wrapper(self, module_type):
+        """
+        Short wrapper around run_game_dep
+        """
+        progress_dialog = {}
+        
+        if module_type == GAME:
+            item = self.get_selected_item(self.ui.treeGame)
+        else:
+            item = self.get_selected_item(self.ui.treeDep)
             
+        if item:
+            for mo, r, c, l in self.run_game_dep(item.tag[0], 
+                                                 item.tag[1], module_type):
+                if not (mo, r) in progress_dialog:
+                    progress_dialog[(mo, r)] = QProgressDialog(self)
+                    dlg = progress_dialog[(mo, r)]
+                    dlg.setMaximum(l)
+                dlg = progress_dialog[(mo, r)]
+                dlg.setValue(c)
+                dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, c, l))
+                self.app.processEvents()
+                
     @QtCore.pyqtSlot()
     def game(self):
         """
         Game treeview was double clicked, install/run the game.
         """
-        item = self.get_selected_item()
-        if item:
-            self.run_game_dep(item.tag[0], item.tag[1], GAME)
-
+        self.run_game_dep_wrapper(GAME)
+        
     @QtCore.pyqtSlot()
     def dep(self):
         """
         Dependency treeview was double clicked, 
         install the dependency.
         """
-        item = self.get_selected_item()
-        if item:
-            self.run_game_dep(item.tag[0], item.tag[1], DEP)
+        self.run_game_dep_wrapper(DEP)
 
     @QtCore.pyqtSlot()
     def exit(self):
@@ -230,13 +247,9 @@ class MainWindow(QMainWindow, HelperMixin):
         """
         tab_index = self.ui.tabGameDep.currentIndex()
         if tab_index == 0:
-            item = self.get_selected_item(self.ui.treeGame)
-            if item:
-                self.run_game_dep(item.tag[0], item.tag[1], GAME)
+            self.run_game_dep_wrapper(GAME)
         elif tab_index == 1:
-            item = self.get_selected_item(self.ui.treeDep)
-            if item:
-                self.run_game_dep(item.tag[0], item.tag[1], DEP)
+            self.run_game_dep_wrapper(DEP)
     
     @QtCore.pyqtSlot()
     def stop(self):
