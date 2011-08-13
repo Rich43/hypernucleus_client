@@ -1,4 +1,3 @@
-from hypernucleus.model.xml_model import XmlModel as Model
 from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP
 #from hypernucleus.controller.main import MainWindow

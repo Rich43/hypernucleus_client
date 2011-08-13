@@ -123,7 +123,7 @@ class SettingsDialog(QDialog):
         self.ui.architectureComboBox.clear()
         
         # Load the model
-        xml_mdl = Model(None, current_url)
+        xml_mdl = Model(current_url)
         
         # Add data to operating system combo
         for os, os_disp in xml_mdl.list_operating_systems():
