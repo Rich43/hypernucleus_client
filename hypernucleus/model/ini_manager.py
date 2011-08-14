@@ -195,3 +195,4 @@ class INIManager:
         
     def delete_installed_version(self, module_name):
         self.conf_file.remove_option(INSTALLED_VERSION, module_name)
+	self.save()
