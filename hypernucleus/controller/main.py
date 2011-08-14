@@ -208,14 +208,16 @@ class MainWindow(QMainWindow, HelperMixin):
         if item:
             for mo, r, c, l in self.run_game_dep(item.tag[0], 
                                                  item.tag[1], module_type):
-                if not (mo, r) in progress_dialog:
+                if not (mo, r) in progress_dialog and l > 2 ** 19:
                     progress_dialog[(mo, r)] = QProgressDialog(self)
                     progress_dialog[(mo, r)].setMaximum(l)
                     progress_dialog[(mo, r)].setVisible(True)
-                dlg = progress_dialog[(mo, r)]
-                dlg.setValue(c)
-                dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, c, l))
-                self.app.processEvents()
+                if (mo, r) in progress_dialog:
+                    dlg = progress_dialog[(mo, r)]
+                    dlg.setValue(c)
+                    dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, 
+                                                                     c, l))
+                    self.app.processEvents()
                 
     @QtCore.pyqtSlot()
     def game(self):

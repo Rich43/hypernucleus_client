@@ -65,7 +65,13 @@ class INIManager:
             self.conf_file.set(PROJNAME, "xmlurl", self.default_url)
             self.conf_file.add_section(INSTALLED_VERSION)
             self.save()
+        self.load()
         
+    def load(self):
+        """
+        Read settings from file.
+        """
+        p = Paths()
         self.conf_file.read(p.ini_path)
         
     def save(self):
@@ -79,6 +85,7 @@ class INIManager:
         """
         Get Data File XML URL
         """
+        self.load()
         try:
             return self.conf_file.get(PROJNAME, "xmlurl")
         except NoOptionError:
@@ -95,6 +102,7 @@ class INIManager:
         """
         Get picture width
         """
+        self.load()
         try:
             return self.conf_file.getint(PROJNAME, "picture_width")
         except NoOptionError:
@@ -111,6 +119,7 @@ class INIManager:
         """
         Get architecture
         """
+        self.load()
         try:
             return self.conf_file.get(PROJNAME, "architecture")
         except NoOptionError:
@@ -127,6 +136,7 @@ class INIManager:
         """
         Get download chunk size
         """
+        self.load()
         try:
             return self.conf_file.getint(PROJNAME, "chunk_size")
         except NoOptionError:
@@ -143,6 +153,7 @@ class INIManager:
         """
         Get operating system
         """
+        self.load()
         try:
             return self.conf_file.get(PROJNAME, "operating_system")
         except NoOptionError:
@@ -159,6 +170,7 @@ class INIManager:
         """
         Get window dimentions
         """
+        self.load()
         options = ["x", "y", "width", "height"]
         for option in options:
             if not self.conf_file.has_option(PROJNAME, option):
@@ -188,6 +200,7 @@ class INIManager:
         self.save()
         
     def get_installed_version(self, module_name):
+        self.load()
         try:
             return self.conf_file.getfloat(INSTALLED_VERSION, module_name)
         except NoOptionError:
@@ -195,4 +208,4 @@ class INIManager:
         
     def delete_installed_version(self, module_name):
         self.conf_file.remove_option(INSTALLED_VERSION, module_name)
-	self.save()
+        self.save()
