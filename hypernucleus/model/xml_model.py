@@ -149,8 +149,3 @@ class XmlModel:
                            arch.find("display_name").text))
         return result
     
-"""
-x = XmlModel(GAME, "http://hypernucleus.pynguins.com/outputs/xml")
-name = "anotherball"
-print(x.get_revision_source(name, x.list_revisions(name)[0]))
-"""

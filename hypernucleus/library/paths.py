@@ -16,7 +16,6 @@
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from hypernucleus.library.find_path import user_data_dir
 from os.path import join
-import getpass
 
 PROJNAME = "hypernucleus"
 
@@ -24,7 +23,7 @@ class Paths:
     """
     Contains path variables
     """
-    datadir = user_data_dir(PROJNAME, owner=getpass.getuser())
+    datadir = user_data_dir(PROJNAME, owner=PROJNAME)
     ini_path = join(datadir, "config.ini")
     games = join(datadir, "games")
     dependencies = join(datadir, "dependencies")

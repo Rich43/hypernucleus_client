@@ -54,10 +54,10 @@ class ModuleInstaller(object):
         headers = dict(header_archive.headers)
         # TODO: what to do if 'content-length' is not specified?
         headers = {k.lower(): v for k, v in headers.items()}
-        self.filesize = headers.get('content-length', -1)
+        self.filesize = int(headers.get('content-length', -1))
         header_archive.close()
         
-    def install(self):
+    def install(self, chunk_size):
         """
         Download the module archive and extract it to the
         corresponding path
@@ -81,13 +81,15 @@ class ModuleInstaller(object):
         keep_going = True
         current_pos = 0
         while keep_going:
-            chunk = archive.read(8192)
-            chunk_size = len(chunk)
-            if chunk_size == 0:
+            chunk = archive.read(chunk_size)
+            if len(chunk) == 0:
                 break
             current_pos += chunk_size
             archivefile.write(chunk)
-            yield (int(current_pos), int(self.filesize))
+            if current_pos > self.filesize:
+                yield (self.filesize, self.filesize)
+            else:
+                yield (current_pos, self.filesize)
             
         # Clean up.
         archivefile.close()

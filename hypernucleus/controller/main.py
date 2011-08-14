@@ -210,8 +210,8 @@ class MainWindow(QMainWindow, HelperMixin):
                                                  item.tag[1], module_type):
                 if not (mo, r) in progress_dialog:
                     progress_dialog[(mo, r)] = QProgressDialog(self)
-                    dlg = progress_dialog[(mo, r)]
-                    dlg.setMaximum(l)
+                    progress_dialog[(mo, r)].setMaximum(l)
+                    progress_dialog[(mo, r)].setVisible(True)
                 dlg = progress_dialog[(mo, r)]
                 dlg.setValue(c)
                 dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, c, l))

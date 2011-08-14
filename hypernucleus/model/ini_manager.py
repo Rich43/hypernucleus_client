@@ -123,6 +123,22 @@ class INIManager:
         self.conf_file.set(PROJNAME, "architecture", architecture)
         self.save()
 
+    def get_chunk_size(self):
+        """
+        Get download chunk size
+        """
+        try:
+            return self.conf_file.getint(PROJNAME, "chunk_size")
+        except NoOptionError:
+            return 8192
+        
+    def set_chunk_size(self, chunk_size):
+        """
+        Set download chunk size
+        """
+        self.conf_file.set(PROJNAME, "chunk_size", str(chunk_size))
+        self.save()
+
     def get_operating_system(self):
         """
         Get operating system

@@ -50,6 +50,7 @@ class HelperMixin:
         Run/Install a Game/Dependency
         """
         source_url = None
+        chunk_size = self.ini_mgr.get_chunk_size()
         
         # Get needed data from model
         binaries = self.m.list_revision_binaries(module_name, module_type, 
@@ -76,7 +77,7 @@ class HelperMixin:
             if is_installed:
                 print("TODO: Run code")
             else:
-                for cur, length in installer.install():
+                for cur, length in installer.install(chunk_size):
                     yield (module_name, revision, cur, length)
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
@@ -89,6 +90,7 @@ class HelperMixin:
                     binary[1] == "pi" and binary[2] == "pi"):
                     source_url = binary[0]
                     break
+                
             if not source_url:
                 raise BinaryNotFound
             
@@ -99,7 +101,7 @@ class HelperMixin:
             
             # If it isn't installed, install it.
             if not is_installed:
-                for cur, length in installer.install():
+                for cur, length in installer.install(chunk_size):
                     yield (module_name, revision, cur, length)
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()

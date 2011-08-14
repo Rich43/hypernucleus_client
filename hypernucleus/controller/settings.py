@@ -39,6 +39,8 @@ class SettingsDialog(QDialog):
                                         self.ini_mgr.get_xml_url())
         self.ui.pictureWidthPixelsSpinBox.setValue(
                                         self.ini_mgr.get_picture_width())
+        self.ui.downloadChunkSizeBytesSpinBox.setValue(
+                                        self.ini_mgr.get_chunk_size())
         self.ui.detectedOperatingSystem.setText(platform.system())
         arch_text = "%s %s" % (platform.architecture()[0],
                                  platform.machine())
@@ -68,6 +70,7 @@ class SettingsDialog(QDialog):
                                         self.arch_combo.currentIndex())
         current_url = self.ui.gameRepositoryURLLineEdit.text()
         picture_width = self.ui.pictureWidthPixelsSpinBox.value()
+        chunk_size = self.ui.downloadChunkSizeBytesSpinBox.value()
         
         # check to see if user has been a prat and entered wrong URL.
         try:
@@ -82,6 +85,7 @@ class SettingsDialog(QDialog):
         self.ini_mgr.set_architecture(selected_arch)
         self.ini_mgr.set_xml_url(current_url)
         self.ini_mgr.set_picture_width(picture_width)
+        self.ini_mgr.set_chunk_size(chunk_size)
         
         # Well done we made it to the end :) Return 1
         self.done(1)
