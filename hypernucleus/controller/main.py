@@ -212,12 +212,13 @@ class MainWindow(QMainWindow, HelperMixin):
                     progress_dialog[(mo, r)] = QProgressDialog(self)
                     progress_dialog[(mo, r)].setMaximum(l)
                     progress_dialog[(mo, r)].setVisible(True)
+                    progress_dialog[(mo, r)].setWindowTitle("Downloading...")
                 if (mo, r) in progress_dialog:
                     dlg = progress_dialog[(mo, r)]
                     dlg.setValue(c)
                     dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, 
                                                                      c, l))
-                    self.app.processEvents()
+                self.app.processEvents()
                 
     @QtCore.pyqtSlot()
     def game(self):
