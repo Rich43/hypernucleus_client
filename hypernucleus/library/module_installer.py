@@ -64,6 +64,7 @@ class ModuleInstaller(object):
         """
         # Moved from __init__
         self._get_file_info()
+        yield (0, self.filesize)
         
         # Remove existing file if it exists
         try:

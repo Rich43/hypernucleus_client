@@ -45,7 +45,7 @@ class HelperMixin:
         else:
             return None
     
-    def run_game_dep(self, module_name, revision, module_type):
+    def run_game_dep(self, module_name, revision, module_type, game_mgr):
         """
         Run/Install a Game/Dependency
         """
@@ -64,7 +64,7 @@ class HelperMixin:
         
         # Install dependencies
         for m_name, ver in dependencies:
-            for mo, r, c, l in self.run_game_dep(m_name, ver, DEP):
+            for mo, r, c, l in self.run_game_dep(m_name, ver, DEP, game_mgr):
                 yield (mo, r, c, l)
         
         if module_type == GAME:
@@ -75,13 +75,13 @@ class HelperMixin:
             is_installed = installer.is_module_installed(module_name, 
                                                          module_type)
             if is_installed:
-                print("TODO: Run code")
+                game_mgr.run_game(module_name)
             else:
                 for cur, length in installer.install(chunk_size):
                     yield (module_name, revision, cur, length)
                 self.ini_mgr.set_installed_version(module_name, revision)
                 self.reset_models()
-                print("TODO: Run code")
+                game_mgr.run_game(module_name)
                 
         elif module_type == DEP:
             # Find the source_url
@@ -112,7 +112,8 @@ class HelperMixin:
             if is_installed and installed_ver != revision:
                 self.uninstall_game_dep(module_name, module_type)
                 for mo, r, c, l in self.run_game_dep(module_name, 
-                                                    revision, module_type):
+                                                     revision, module_type,
+                                                     game_mgr):
                     yield (mo, r, c, l)
                 
     def uninstall_game_dep(self, module_name, module_type):

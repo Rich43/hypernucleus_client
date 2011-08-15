@@ -8,6 +8,7 @@ from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
 from hypernucleus.library.module_installer import ModuleInstaller
+from hypernucleus.library.game_manager import GameManager
 from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
                                 INSTALLED_VERSION)
 from hypernucleus.controller.helper_mixin import HelperMixin
@@ -26,6 +27,7 @@ class MainWindow(QMainWindow, HelperMixin):
         self.app = app
         self.m = m
         self.ui = uic.loadUi(main_path, self)
+        self.game_mgr = GameManager()
         
         # Set the window dimensions from config.
         self.ini_mgr = INIManager()
@@ -207,7 +209,9 @@ class MainWindow(QMainWindow, HelperMixin):
             
         if item:
             for mo, r, c, l in self.run_game_dep(item.tag[0], 
-                                                 item.tag[1], module_type):
+                                                 item.tag[1], 
+                                                 module_type,
+                                                 self.game_mgr):
                 if not (mo, r) in progress_dialog and l > 2 ** 19:
                     progress_dialog[(mo, r)] = QProgressDialog(self)
                     progress_dialog[(mo, r)].setMaximum(l)

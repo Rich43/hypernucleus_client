@@ -1,5 +1,6 @@
 import sys
-from time import sleep
+import argparse
+from gettext import ngettext
 from PyQt4 import Qt
 from PyQt4.QtGui import QMessageBox
 from hypernucleus.controller.main import MainWindow
@@ -7,6 +8,9 @@ from hypernucleus.controller.settings import SettingsDialog
 from hypernucleus.view.icons import qInitResources
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.xml_model import XmlModel as Model, InvalidURL
+
+# work around a debian bug.
+argparse.ngettext = ngettext
 
 INVALID_REPO = """The repository URL must be set for Hypernucleus to 
 function. A settings dialog will open to allow you to set 
@@ -25,6 +29,18 @@ INVALID_OS_ARCH_FAIL = """You failed to select an operating system and
 architecture. Hypernucleus will now exit.""".replace("\n", "")
 
 def main():
+    # Before we do anything, we need to check for command line arguments.
+    parser = argparse.ArgumentParser(description='A Python Game Database.')
+    parser.add_argument('-r', "--run-game", 
+                        metavar='MODULE_NAME',
+                        action="store",
+                        help='Run a Python game.')
+    args = parser.parse_args()
+    if args.run_game:
+        print(args.run_game)
+        sys.exit()
+        
+    # Get QApplication object.
     app = Qt.QApplication(sys.argv)
     
     # Load image resources
@@ -48,6 +64,7 @@ def main():
         if not result:
             QMessageBox.critical(settings,"Exiting...", INVALID_OS_ARCH_FAIL)
             sys.exit()
+            
     # Open the main window.
     main_window = MainWindow(app, m)
     main_window.show()
