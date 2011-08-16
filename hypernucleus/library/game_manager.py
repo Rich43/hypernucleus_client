@@ -42,8 +42,9 @@ class GameManager:
             sys.path.append(p.games)
         
         # Add dependencys to path
-        for dep_name, dep_ver in xml_data.list_dependencies(game_name, 
-                                                        game_module_type):
+        for dep_name, dep_ver in \
+                    xml_data.list_dependencies_recursive(game_name, 
+                                                         game_module_type):
             dep_module_type = xml_data.get_revision_module_type(dep_name,
                                                                 DEP,
                                                                 dep_ver)
