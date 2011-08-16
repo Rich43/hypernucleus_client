@@ -1,5 +1,11 @@
 import sys
+import os
+from os.path import join
 from subprocess import Popen, call
+from hypernucleus.model.ini_manager import INIManager
+from hypernucleus.model.xml_model import XmlModel
+from hypernucleus.model import GAME, DEP
+from hypernucleus.library.paths import Paths
 
 class GameManager:
     """
@@ -9,10 +15,52 @@ class GameManager:
     
     def __init__(self):
         self.apppath = sys.argv[0]
+    
+    def execute_game(self, game_name):
+        """
+        Run the game itself.
+        """
+        p = Paths()
         
+        # Load XML File
+        ini_data = INIManager()
+        xml_data = XmlModel(ini_data.get_xml_url())
+         
+        # Change directory to the game's folder
+        os.chdir(join(p.games, game_name))
+        
+        # Get various needed data
+        game_ins_ver = ini_data.get_installed_version(game_name)
+        game_module_type = xml_data.get_revision_module_type(game_name, 
+                                                             GAME, 
+                                                             game_ins_ver)
+        
+        # Figure out if its a file or folder module
+        if game_module_type == "file":
+            sys.path.append(join(p.games, game_name))
+        else:
+            sys.path.append(p.games)
+        
+        # Add dependencys to path
+        for dep_name, dep_ver in xml_data.list_dependencies(game_name, 
+                                                        game_module_type):
+            dep_module_type = xml_data.get_revision_module_type(dep_name,
+                                                                DEP,
+                                                                dep_ver)
+            if dep_module_type == "file":
+                sys.path.append(join(p.dependencys, dep_name))
+            else:
+                sys.path.append(p.dependencys)
+            
+        # Run it
+        game = __import__(game_name)
+        
+        if hasattr(game, "main"):
+            game.main()
+    
     def run_game(self, game_name):
         """
-        Run the game
+        Run the game optional argument.
         """
         # Remove stopped games.
         self.cleanup()

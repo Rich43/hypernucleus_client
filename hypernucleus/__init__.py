@@ -8,6 +8,7 @@ from hypernucleus.controller.settings import SettingsDialog
 from hypernucleus.view.icons import qInitResources
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.xml_model import XmlModel as Model, InvalidURL
+from hypernucleus.library.game_manager import GameManager
 
 # work around a debian bug.
 argparse.ngettext = ngettext
@@ -29,6 +30,9 @@ INVALID_OS_ARCH_FAIL = """You failed to select an operating system and
 architecture. Hypernucleus will now exit.""".replace("\n", "")
 
 def main():
+    """
+    Launch hypernucleus
+    """
     # Before we do anything, we need to check for command line arguments.
     parser = argparse.ArgumentParser(description='A Python Game Database.')
     parser.add_argument('-r', "--run-game", 
@@ -37,7 +41,8 @@ def main():
                         help='Run a Python game.')
     args = parser.parse_args()
     if args.run_game:
-        print(args.run_game)
+        game_mgr = GameManager()
+        game_mgr.execute_game(args.run_game)
         sys.exit()
         
     # Get QApplication object.
