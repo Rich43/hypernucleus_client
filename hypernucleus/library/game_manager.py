@@ -41,17 +41,16 @@ class GameManager:
         else:
             sys.path.append(p.games)
         
-        # Add dependencys to path
+        # Add dependencies to path
         for dep_name, dep_ver in \
-                    xml_data.list_dependencies_recursive(game_name, 
-                                                         game_module_type):
+                    xml_data.list_dependencies_recursive(game_name, GAME):
             dep_module_type = xml_data.get_revision_module_type(dep_name,
                                                                 DEP,
                                                                 dep_ver)
             if dep_module_type == "file":
-                sys.path.append(join(p.dependencys, dep_name))
+                sys.path.append(join(p.dependencies, dep_name))
             else:
-                sys.path.append(p.dependencys)
+                sys.path.append(p.dependencies)
             
         # Run it
         game = __import__(game_name)
@@ -74,7 +73,7 @@ class GameManager:
         """
         Removes stopped games
         """
-        for key, value in self.gamelist.items():
+        for key, value in dict(self.gamelist.items()):
             if value.poll() != None:
                 del(self.gamelist[key])
                 

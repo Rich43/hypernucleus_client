@@ -162,7 +162,8 @@ class MainWindow(QMainWindow, HelperMixin):
             # display them in the treeview.
             list_model = TreeModel(["Name", "Version"])
             root_item = list_model.rootItem
-            for dep in self.m.list_dependencies(m_name, module_type):
+            for dep in self.m.list_dependencies_recursive(m_name, 
+                                                          module_type):
                 list_model.appendChild(TreeItem([dep[0], str(dep[1])], 
                                                 root_item))
             self.ui.dependenciesTreeView.setModel(list_model)
@@ -223,7 +224,8 @@ class MainWindow(QMainWindow, HelperMixin):
                     dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, 
                                                                      c, l))
                 self.app.processEvents()
-                
+            self.reset_models()
+            
     @QtCore.pyqtSlot()
     def game(self):
         """
@@ -263,8 +265,10 @@ class MainWindow(QMainWindow, HelperMixin):
         """
         Kill the currently running game.
         """
-        print("Method 'stop' executed.")
-        
+        #self.game_mgr.stop_game_linux_mac(game_name)
+        #self.game_mgr.stop_game_windows(game_name)
+        pass
+    
     @QtCore.pyqtSlot()
     def uninstall(self):
         """

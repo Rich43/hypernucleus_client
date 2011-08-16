@@ -51,8 +51,8 @@ class XmlModel:
         self.valid_type(module_type, False)
         name = quoteattr(name)
         item = self.etree.find(module_type + "[name=%s]" % name)
-        if not len(item):
-            raise ModuleNameNotFound
+        if item is None:
+            raise ModuleNameNotFound("%s of type %s" % (name, module_type))
         else:
             return item
     
