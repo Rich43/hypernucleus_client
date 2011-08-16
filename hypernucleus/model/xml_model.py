@@ -87,6 +87,14 @@ class XmlModel:
                            float(dep.find("version").text)))
         return result
     
+    def list_dependencies_recursive(self, module_name, module_type):
+        dependencies = self.list_dependencies(module_name, module_type)
+        if dependencies:
+            for m_name, ver in dependencies:
+                yield (m_name, ver)
+                for item in self.list_dependencies_recursive(m_name, DEP):
+                    yield item
+    
     def list_revisions(self, module_name, module_type):
         """
         Return sorted list of revisions.
