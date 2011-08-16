@@ -24,6 +24,9 @@ class HeadRequest(urllib.request.Request):
         return 'HEAD'
 
 class ModuleInstaller(object):
+    """
+    Downloads and installs python modules.
+    """
     path = Paths()
     
     def __init__(self, url, module_type):
