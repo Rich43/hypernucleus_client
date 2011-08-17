@@ -54,6 +54,9 @@ class HelperMixin:
         arch = self.ini_mgr.get_architecture()
         binaries = self.m.list_revision_binaries(module_name, DEP, 
                                                  revision)
+        display_name = self.m.get_display_name(module_name, DEP)
+        os_display_name = self.m.get_operating_system_display_name(os)
+        arch_display_name = self.m.get_architecture_display_name(arch)
         source_url = None
         
         # Find the source_url
@@ -64,7 +67,11 @@ class HelperMixin:
                 return source_url
         
         # If not found, raise an exception.
-        raise BinaryNotFound
+        raise BinaryNotFound({"display_name": display_name, 
+                              "name": module_name, 
+                              "revision": revision, 
+                              "os": os_display_name, 
+                              "arch": arch_display_name})
         
     def run_game_dep(self, module_name, revision, module_type, game_mgr):
         """

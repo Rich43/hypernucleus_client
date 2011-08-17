@@ -141,6 +141,24 @@ class XmlModel:
                            binary.find("architecture").text))
         return result
     
+    def get_operating_system_display_name(self, operating_system):
+        operating_system = quoteattr(operating_system)
+        item = self.etree.find(
+                    "operatingsystem[name=%s]" % operating_system)
+        if item is not None:
+            return item.find("display_name").text
+        else:
+            return None
+    
+    def get_architecture_display_name(self, architecture):
+        architecture = quoteattr(architecture)
+        item = self.etree.find(
+                    "architecture[name=%s]" % architecture)
+        if item is not None:
+            return item.find("display_name").text
+        else:
+            return None
+    
     def list_operating_systems(self):
         item = self.etree.findall("operatingsystem")
         result = []

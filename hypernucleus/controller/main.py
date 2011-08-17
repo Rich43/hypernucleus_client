@@ -13,7 +13,7 @@ from hypernucleus.library.module_installer import (ModuleInstaller,
 from hypernucleus.library.game_manager import GameManager
 from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
                                 INSTALLED_VERSION)
-from hypernucleus.controller.helper_mixin import HelperMixin
+from hypernucleus.controller.helper_mixin import HelperMixin, BinaryNotFound
 from hypernucleus.controller.settings import SettingsDialog
 from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog, QMessageBox
 from PyQt4 import uic, QtCore
@@ -214,6 +214,15 @@ class MainWindow(QMainWindow, HelperMixin):
         win_title = "Downloading..."
         DOWNLOAD_FAIL = "Could not download game or dependency."
         DOWNLOAD_FAIL += " Check Internet connection and try again."
+        DEP_FAIL = "Could not find a dependency with "
+        DEP_FAIL += "the following requirements:\n"
+        DEP_FAIL += "Project Name: %(name)s\n"
+        DEP_FAIL += "Python Module Name: %(display_name)s\n"
+        DEP_FAIL += "Version: %(revision)s\n"
+        DEP_FAIL += "Operating System: %(os)s\n"
+        DEP_FAIL += "Architecture: %(arch)s\n"
+        DEP_FAIL += "Ask the project maintainer(s) to upload "
+        DEP_FAIL += "a binary for your operating system and architecture."
         
         if module_type == GAME:
             item = self.get_selected_item(self.ui.treeGame)
@@ -250,7 +259,10 @@ class MainWindow(QMainWindow, HelperMixin):
                                          "Download Failed", 
                                          DOWNLOAD_FAIL)
                     return
-                
+            except BinaryNotFound as e:
+                QMessageBox.critical(self, 
+                                         "Cannot find dependency.", 
+                                         DEP_FAIL % e.args[0])
             self.reset_models()
             
     @QtCore.pyqtSlot()
