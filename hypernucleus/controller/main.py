@@ -7,13 +7,15 @@ Created on 23 Jul 2011
 from hypernucleus.view import main_path
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
-from hypernucleus.library.module_installer import ModuleInstaller
+from hypernucleus.model.xml_model import XmlModel as Model
+from hypernucleus.library.module_installer import (ModuleInstaller,
+                                                   DownloadError)
 from hypernucleus.library.game_manager import GameManager
 from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
                                 INSTALLED_VERSION)
 from hypernucleus.controller.helper_mixin import HelperMixin
 from hypernucleus.controller.settings import SettingsDialog
-from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog
+from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog, QMessageBox
 from PyQt4 import uic, QtCore
 import sys
 
@@ -99,7 +101,13 @@ class MainWindow(QMainWindow, HelperMixin):
         installer = ModuleInstaller(None, module_type)
         for m_name in self.m.list_module_names(module_type):
             rev_list = self.m.list_revisions(m_name, module_type)
+            # Ignore this module if it has no revisions.
+            if not len(rev_list):
+                continue
+            # Check to see if module is installed
             is_installed = installer.is_module_installed(m_name, module_type)
+            # If so, put item in installed category
+            # Else put in not installed
             if is_installed:
                 tree_item = ins
                 installed_version = str(self.ini_mgr.get_installed_version(
@@ -197,11 +205,15 @@ class MainWindow(QMainWindow, HelperMixin):
         elif tab_index == 1:
             self.selection_changed(tab_index, tab_index, DEP)
     
-    def run_game_dep_wrapper(self, module_type):
+    def run_game_dep_wrapper(self, module_type, retry=False):
         """
         Short wrapper around run_game_dep
         """
         progress_dialog = {}
+        label_text = "Installing %s %s, %s of %s"
+        win_title = "Downloading..."
+        DOWNLOAD_FAIL = "Could not download game or dependency."
+        DOWNLOAD_FAIL += " Check Internet connection and try again."
         
         if module_type == GAME:
             item = self.get_selected_item(self.ui.treeGame)
@@ -209,21 +221,36 @@ class MainWindow(QMainWindow, HelperMixin):
             item = self.get_selected_item(self.ui.treeDep)
             
         if item:
-            for mo, r, c, l in self.run_game_dep(item.tag[0], 
-                                                 item.tag[1], 
-                                                 module_type,
-                                                 self.game_mgr):
-                if not (mo, r) in progress_dialog and l > 2 ** 19:
-                    progress_dialog[(mo, r)] = QProgressDialog(self)
-                    progress_dialog[(mo, r)].setMaximum(l)
-                    progress_dialog[(mo, r)].setVisible(True)
-                    progress_dialog[(mo, r)].setWindowTitle("Downloading...")
-                if (mo, r) in progress_dialog:
-                    dlg = progress_dialog[(mo, r)]
-                    dlg.setValue(c)
-                    dlg.setLabelText("Installing %s %s, %s of %s" % (mo, r, 
-                                                                     c, l))
-                self.app.processEvents()
+            try:
+                for mo, r, c, l in self.run_game_dep(item.tag[0], 
+                                                     item.tag[1], 
+                                                     module_type,
+                                                     self.game_mgr):
+                    if not (mo, r) in progress_dialog and l > 2 ** 19:
+                        progress_dialog[(mo, r)] = QProgressDialog(self)
+                        progress_dialog[(mo, r)].setMaximum(l)
+                        progress_dialog[(mo, r)].setVisible(True)
+                        progress_dialog[(mo, r)].setWindowTitle(win_title)
+                    if (mo, r) in progress_dialog:
+                        dlg = progress_dialog[(mo, r)]
+                        dlg.setValue(c)
+                        dlg.setLabelText(label_text % (mo, r, c, l))
+                    self.app.processEvents()
+            except DownloadError:
+                # If we have not been here before.
+                if not retry:
+                    # Reset the model and have another go.
+                    self.m = Model(self.ini_mgr.get_xml_url())
+                    self.reset_models()
+                    self.run_game_dep_wrapper(module_type, True)
+                    return
+                else:
+                    # Went wrong twice, show error.
+                    QMessageBox.critical(self, 
+                                         "Download Failed", 
+                                         DOWNLOAD_FAIL)
+                    return
+                
             self.reset_models()
             
     @QtCore.pyqtSlot()
