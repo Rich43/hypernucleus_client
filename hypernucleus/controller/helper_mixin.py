@@ -1,6 +1,9 @@
 from PyQt4 import QtCore
-from hypernucleus.library.module_installer import ModuleInstaller
+from PyQt4.QtGui import QProgressDialog, QMessageBox
+from hypernucleus.library.module_installer import (ModuleInstaller, 
+                                                   DownloadError)
 from hypernucleus.model import GAME, DEP
+from hypernucleus.model.xml_model import XmlModel as Model
 
 class InvalidVersion(Exception):
     pass
@@ -126,7 +129,76 @@ class HelperMixin:
                     yield (module_name, revision, cur, length)
                 self.ini_mgr.set_installed_version(module_name, revision)
                 game_mgr.run_game(module_name)
-                
+    
+    def run_game_dep_wrapper(self, module_type, retry=False):
+        """
+        Short wrapper around run_game_dep
+        """
+        progress_dialog = {}
+        label_text = "Installing %s %s, %s of %s"
+        win_title = "Downloading..."
+        DOWNLOAD_FAIL = "Could not download game or dependency."
+        DOWNLOAD_FAIL += " Check Internet connection and try again."
+        DEP_FAIL = "Could not find a dependency that meets "
+        DEP_FAIL += "the following requirements:\n"
+        DEP_FAIL += "Project Name: %(name)s\n"
+        DEP_FAIL += "Python Module Name: %(display_name)s\n"
+        DEP_FAIL += "Version: %(revision)s\n"
+        DEP_FAIL += "Operating System: %(os)s\n"
+        DEP_FAIL += "Architecture: %(arch)s\n"
+        DEP_FAIL += "Ask the project maintainer(s) to upload "
+        DEP_FAIL += "a binary for your operating system and architecture."
+        
+        # Get the currently selected item
+        if module_type == GAME:
+            item = self.get_selected_item(self.ui.treeGame)
+        else:
+            item = self.get_selected_item(self.ui.treeDep)
+            
+        if item:
+            try:
+                # Display a progress dialog while downloading
+                # games and dependencies
+                for mo, r, c, l in self.run_game_dep(item.tag[0], 
+                                                     item.tag[1], 
+                                                     module_type,
+                                                     self.game_mgr):
+                    # If there is not a progress dialog for
+                    # this module already, then make one.
+                    if not (mo, r) in progress_dialog and l > 2 ** 19:
+                        progress_dialog[(mo, r)] = QProgressDialog(self)
+                        progress_dialog[(mo, r)].setMaximum(l)
+                        progress_dialog[(mo, r)].setVisible(True)
+                        progress_dialog[(mo, r)].setWindowTitle(win_title)
+                    # If dialog already exists, update its progress.
+                    if (mo, r) in progress_dialog:
+                        dlg = progress_dialog[(mo, r)]
+                        dlg.setValue(c)
+                        dlg.setLabelText(label_text % (mo, r, c, l))
+                    # Make sure GUI stays responsive.
+                    self.app.processEvents()
+            # Cannot download a URL (i.e. 404 Not Found)
+            except DownloadError:
+                # If we have not been here before.
+                if not retry:
+                    # Reset the model and have another go.
+                    self.m = Model(self.ini_mgr.get_xml_url())
+                    self.reset_models()
+                    self.run_game_dep_wrapper(module_type, True)
+                    return
+                else:
+                    # Went wrong twice, show error.
+                    QMessageBox.critical(self, 
+                                         "Download Failed", 
+                                         DOWNLOAD_FAIL)
+                    return
+            # Cannot find a matching dependency.
+            except BinaryNotFound as e:
+                QMessageBox.critical(self, 
+                                         "Cannot find dependency.", 
+                                         DEP_FAIL % e.args[0])
+            self.reset_models()
+    
     def uninstall_game_dep(self, module_name, module_type):
         """
         Uninstall a Game/Dependency

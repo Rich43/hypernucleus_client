@@ -5,11 +5,11 @@ Created on 23 Jul 2011
 '''
 
 from PyQt4 import uic, QtCore
-from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog, QMessageBox
-from hypernucleus.controller.helper_mixin import HelperMixin, BinaryNotFound
+from PyQt4.QtGui import QMainWindow, QTreeView
+from hypernucleus.controller.helper_mixin import HelperMixin
 from hypernucleus.controller.settings import SettingsDialog
 from hypernucleus.library.game_manager import GameManager
-from hypernucleus.library.module_installer import ModuleInstaller, DownloadError
+from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED, \
     INSTALLED_VERSION
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
@@ -44,6 +44,7 @@ class MainWindow(QMainWindow, HelperMixin):
         # Connect all signals/events
         self.quick_connect("actionExit", "exit")
         self.quick_connect("actionRun", "run")
+        self.quick_connect("actionRefresh", "refresh")
         self.quick_connect("actionStop", "stop")
         self.quick_connect("actionUninstall", "uninstall")
         self.quick_connect("actionSettings", "settings")
@@ -203,76 +204,15 @@ class MainWindow(QMainWindow, HelperMixin):
             self.selection_changed(tab_index, tab_index, GAME)
         elif tab_index == 1:
             self.selection_changed(tab_index, tab_index, DEP)
-    
-    def run_game_dep_wrapper(self, module_type, retry=False):
+            
+    @QtCore.pyqtSlot()
+    def refresh(self):
         """
-        Short wrapper around run_game_dep
+        Refresh button was pressed, reload model.
         """
-        progress_dialog = {}
-        label_text = "Installing %s %s, %s of %s"
-        win_title = "Downloading..."
-        DOWNLOAD_FAIL = "Could not download game or dependency."
-        DOWNLOAD_FAIL += " Check Internet connection and try again."
-        DEP_FAIL = "Could not find a dependency that meets "
-        DEP_FAIL += "the following requirements:\n"
-        DEP_FAIL += "Project Name: %(name)s\n"
-        DEP_FAIL += "Python Module Name: %(display_name)s\n"
-        DEP_FAIL += "Version: %(revision)s\n"
-        DEP_FAIL += "Operating System: %(os)s\n"
-        DEP_FAIL += "Architecture: %(arch)s\n"
-        DEP_FAIL += "Ask the project maintainer(s) to upload "
-        DEP_FAIL += "a binary for your operating system and architecture."
+        self.m = Model(self.ini_mgr.get_xml_url())
+        self.reset_models()
         
-        # Get the currently selected item
-        if module_type == GAME:
-            item = self.get_selected_item(self.ui.treeGame)
-        else:
-            item = self.get_selected_item(self.ui.treeDep)
-            
-        if item:
-            try:
-                # Display a progress dialog while downloading
-                # games and dependencies
-                for mo, r, c, l in self.run_game_dep(item.tag[0], 
-                                                     item.tag[1], 
-                                                     module_type,
-                                                     self.game_mgr):
-                    # If there is not a progress dialog for
-                    # this module already, then make one.
-                    if not (mo, r) in progress_dialog and l > 2 ** 19:
-                        progress_dialog[(mo, r)] = QProgressDialog(self)
-                        progress_dialog[(mo, r)].setMaximum(l)
-                        progress_dialog[(mo, r)].setVisible(True)
-                        progress_dialog[(mo, r)].setWindowTitle(win_title)
-                    # If dialog already exists, update its progress.
-                    if (mo, r) in progress_dialog:
-                        dlg = progress_dialog[(mo, r)]
-                        dlg.setValue(c)
-                        dlg.setLabelText(label_text % (mo, r, c, l))
-                    # Make sure GUI stays responsive.
-                    self.app.processEvents()
-            # Cannot download a URL (i.e. 404 Not Found)
-            except DownloadError:
-                # If we have not been here before.
-                if not retry:
-                    # Reset the model and have another go.
-                    self.m = Model(self.ini_mgr.get_xml_url())
-                    self.reset_models()
-                    self.run_game_dep_wrapper(module_type, True)
-                    return
-                else:
-                    # Went wrong twice, show error.
-                    QMessageBox.critical(self, 
-                                         "Download Failed", 
-                                         DOWNLOAD_FAIL)
-                    return
-            # Cannot find a matching dependency.
-            except BinaryNotFound as e:
-                QMessageBox.critical(self, 
-                                         "Cannot find dependency.", 
-                                         DEP_FAIL % e.args[0])
-            self.reset_models()
-            
     @QtCore.pyqtSlot()
     def game(self):
         """
