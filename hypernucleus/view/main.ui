@@ -271,7 +271,7 @@
               <x>0</x>
               <y>0</y>
               <width>581</width>
-              <height>568</height>
+              <height>543</height>
              </rect>
             </property>
             <widget class="QWidget" name="layoutWidget">
@@ -341,6 +341,15 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>32</width>
+     <height>32</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -351,6 +360,7 @@
    <addaction name="actionStop"/>
    <addaction name="actionUninstall"/>
    <addaction name="separator"/>
+   <addaction name="actionRefresh"/>
    <addaction name="actionSettings"/>
    <addaction name="separator"/>
    <addaction name="actionExit"/>
@@ -361,10 +371,16 @@
      <normaloff>:/exit.png</normaloff>:/exit.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Exit</string>
+    <string>Exit</string>
    </property>
    <property name="iconText">
     <string>&amp;Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit (Alt+E)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
    </property>
   </action>
   <action name="actionRun">
@@ -376,7 +392,10 @@
     <string>Run</string>
    </property>
    <property name="toolTip">
-    <string>Run</string>
+    <string>Run (Alt+R)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+R</string>
    </property>
   </action>
   <action name="actionStop">
@@ -388,7 +407,10 @@
     <string>Stop</string>
    </property>
    <property name="toolTip">
-    <string>Stop</string>
+    <string>Stop (Alt+T)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+T</string>
    </property>
   </action>
   <action name="actionUninstall">
@@ -400,7 +422,7 @@
     <string>Uninstall</string>
    </property>
    <property name="toolTip">
-    <string>Uninstall</string>
+    <string>Uninstall (Alt+U)</string>
    </property>
    <property name="shortcut">
     <string>Alt+U</string>
@@ -415,10 +437,25 @@
     <string>Settings</string>
    </property>
    <property name="toolTip">
-    <string>Settings</string>
+    <string>Settings (Alt+S)</string>
    </property>
    <property name="shortcut">
     <string>Alt+S</string>
+   </property>
+  </action>
+  <action name="actionRefresh">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/quick_restart.png</normaloff>:/quick_restart.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh</string>
+   </property>
+   <property name="toolTip">
+    <string>Redownload a list of games and dependencies. (F5)</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
  </widget>

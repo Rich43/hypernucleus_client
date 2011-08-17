@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="/">
+    <file>quick_restart.png</file>
     <file>dep.png</file>
     <file>games.png</file>
     <file>xcf.png</file>

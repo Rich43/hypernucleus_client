@@ -72,7 +72,7 @@ class HelperMixin:
         """
         # Get dependencies from model
         dependencies = list(self.m.list_dependencies_recursive(module_name, 
-                                                          module_type))
+                                                               module_type))
         
         # Add myself to dependencies if i am one.
         if module_type == DEP:
