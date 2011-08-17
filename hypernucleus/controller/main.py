@@ -214,7 +214,7 @@ class MainWindow(QMainWindow, HelperMixin):
         win_title = "Downloading..."
         DOWNLOAD_FAIL = "Could not download game or dependency."
         DOWNLOAD_FAIL += " Check Internet connection and try again."
-        DEP_FAIL = "Could not find a dependency with "
+        DEP_FAIL = "Could not find a dependency that meets "
         DEP_FAIL += "the following requirements:\n"
         DEP_FAIL += "Project Name: %(name)s\n"
         DEP_FAIL += "Python Module Name: %(display_name)s\n"
@@ -224,6 +224,7 @@ class MainWindow(QMainWindow, HelperMixin):
         DEP_FAIL += "Ask the project maintainer(s) to upload "
         DEP_FAIL += "a binary for your operating system and architecture."
         
+        # Get the currently selected item
         if module_type == GAME:
             item = self.get_selected_item(self.ui.treeGame)
         else:
@@ -231,20 +232,27 @@ class MainWindow(QMainWindow, HelperMixin):
             
         if item:
             try:
+                # Display a progress dialog while downloading
+                # games and dependencies
                 for mo, r, c, l in self.run_game_dep(item.tag[0], 
                                                      item.tag[1], 
                                                      module_type,
                                                      self.game_mgr):
+                    # If there is not a progress dialog for
+                    # this module already, then make one.
                     if not (mo, r) in progress_dialog and l > 2 ** 19:
                         progress_dialog[(mo, r)] = QProgressDialog(self)
                         progress_dialog[(mo, r)].setMaximum(l)
                         progress_dialog[(mo, r)].setVisible(True)
                         progress_dialog[(mo, r)].setWindowTitle(win_title)
+                    # If dialog already exists, update its progress.
                     if (mo, r) in progress_dialog:
                         dlg = progress_dialog[(mo, r)]
                         dlg.setValue(c)
                         dlg.setLabelText(label_text % (mo, r, c, l))
+                    # Make sure GUI stays responsive.
                     self.app.processEvents()
+            # Cannot download a URL (i.e. 404 Not Found)
             except DownloadError:
                 # If we have not been here before.
                 if not retry:
@@ -259,6 +267,7 @@ class MainWindow(QMainWindow, HelperMixin):
                                          "Download Failed", 
                                          DOWNLOAD_FAIL)
                     return
+            # Cannot find a matching dependency.
             except BinaryNotFound as e:
                 QMessageBox.critical(self, 
                                          "Cannot find dependency.", 
