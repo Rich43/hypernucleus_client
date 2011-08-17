@@ -73,7 +73,7 @@ class GameManager:
         """
         Removes stopped games
         """
-        for key, value in dict(self.gamelist.items()):
+        for key, value in dict(self.gamelist).items():
             if value.poll() != None:
                 del(self.gamelist[key])
                 
