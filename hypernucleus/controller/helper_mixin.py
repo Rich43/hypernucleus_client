@@ -88,13 +88,13 @@ class HelperMixin:
             dependencies.append((module_name, module_type))
             
         # Get some data from INI File
-        installed_ver = self.ini_mgr.get_installed_version(module_name)
         chunk_size = self.ini_mgr.get_chunk_size()
         
         # Install dependencies
         for dep_name, dep_ver in dependencies:
             # Get revision's source url.
             source_url = self.get_binary_source_url(dep_name, dep_ver)
+            installed_ver = self.ini_mgr.get_installed_version(dep_name)
             
             # Figure if module is installed
             installer = ModuleInstaller(source_url, DEP)
