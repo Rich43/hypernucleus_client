@@ -3,8 +3,8 @@
 from distutils.core import setup
 
 setup(name='hypernucleus',
-      version='0.1',
-      description='Python Games Database',
+      version='1.0',
+      description="Hypernucleus Client - A Python Game Database",
       author='Richie Ward',
       author_email='RichieS@GMail.com',
       url='http://hypernucleus.pynguins.com',
