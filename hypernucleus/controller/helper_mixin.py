@@ -98,8 +98,7 @@ class HelperMixin:
             
             # Figure if module is installed
             installer = ModuleInstaller(source_url, DEP)
-            is_installed = installer.is_module_installed(dep_name, 
-                                                         module_type)
+            is_installed = installer.is_module_installed(dep_name, DEP)
             
             # If it isn't installed, install it.
             if not is_installed:
@@ -109,19 +108,19 @@ class HelperMixin:
             
             # If the version does not match with the installed version,
             # Remove the current version and install new one.
-            if is_installed and installed_ver != revision:
-                self.uninstall_game_dep(dep_name, module_type)
+            if is_installed and installed_ver != dep_ver:
+                self.uninstall_game_dep(dep_name, DEP)
                 for cur, length in installer.install(chunk_size):
                     yield (dep_name, dep_ver, cur, length)
-        
+                self.ini_mgr.set_installed_version(dep_name, dep_ver)
+                
         # Install/run game
         if module_type == GAME:
             source_url = self.m.get_revision_source(module_name, 
                                                     module_type, 
                                                     revision, True)
-            installer = ModuleInstaller(source_url, module_type)
-            is_installed = installer.is_module_installed(module_name, 
-                                                         module_type)
+            installer = ModuleInstaller(source_url, GAME)
+            is_installed = installer.is_module_installed(module_name, GAME)
             if is_installed:
                 game_mgr.run_game(module_name)
             else:
