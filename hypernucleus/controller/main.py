@@ -4,19 +4,18 @@ Created on 23 Jul 2011
 @author: r
 '''
 
-from hypernucleus.view import main_path
+from PyQt4 import uic, QtCore
+from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog, QMessageBox
+from hypernucleus.controller.helper_mixin import HelperMixin, BinaryNotFound
+from hypernucleus.controller.settings import SettingsDialog
+from hypernucleus.library.game_manager import GameManager
+from hypernucleus.library.module_installer import ModuleInstaller, DownloadError
+from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED, \
+    INSTALLED_VERSION
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.tree_model import TreeModel, TreeItem
 from hypernucleus.model.xml_model import XmlModel as Model
-from hypernucleus.library.module_installer import (ModuleInstaller,
-                                                   DownloadError)
-from hypernucleus.library.game_manager import GameManager
-from hypernucleus.model import (GAME, DEP, INSTALLED, NOT_INSTALLED,
-                                INSTALLED_VERSION)
-from hypernucleus.controller.helper_mixin import HelperMixin, BinaryNotFound
-from hypernucleus.controller.settings import SettingsDialog
-from PyQt4.QtGui import QMainWindow, QTreeView, QProgressDialog, QMessageBox
-from PyQt4 import uic, QtCore
+from hypernucleus.view import main_path
 import sys
 
 class MainWindow(QMainWindow, HelperMixin):

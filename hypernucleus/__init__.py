@@ -1,14 +1,14 @@
-import sys
-import argparse
-from gettext import ngettext
 from PyQt4 import Qt
 from PyQt4.QtGui import QMessageBox
+from gettext import ngettext
 from hypernucleus.controller.main import MainWindow
 from hypernucleus.controller.settings import SettingsDialog
-from hypernucleus.view.icons import qInitResources
+from hypernucleus.library.game_manager import GameManager
 from hypernucleus.model.ini_manager import INIManager, WindowDimentions
 from hypernucleus.model.xml_model import XmlModel as Model, InvalidURL
-from hypernucleus.library.game_manager import GameManager
+from hypernucleus.view.icons import qInitResources
+import argparse
+import sys
 
 # work around a debian bug.
 argparse.ngettext = ngettext

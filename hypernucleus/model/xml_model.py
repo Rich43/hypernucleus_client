@@ -1,6 +1,6 @@
 from hypernucleus.model import GAME, DEP
-from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
+from urllib.request import urlopen
 from xml.etree.ElementTree import ElementTree, ParseError
 from xml.sax.saxutils import quoteattr
 

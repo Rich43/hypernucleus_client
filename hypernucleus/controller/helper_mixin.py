@@ -1,7 +1,6 @@
+from PyQt4 import QtCore
 from hypernucleus.library.module_installer import ModuleInstaller
 from hypernucleus.model import GAME, DEP
-#from hypernucleus.controller.main import MainWindow
-from PyQt4 import QtCore
 
 class InvalidVersion(Exception):
     pass
