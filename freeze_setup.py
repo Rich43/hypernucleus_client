@@ -9,6 +9,7 @@ if sys.platform == "win32":
 
 include_files = glob.glob(join("hypernucleus", "view", "*.ui"))
 include_files = [(p, sep.join(p.split(sep)[1:])) for p in include_files]
+includes = ["multiprocessing"]
 excludes = []
 packages = []
 
@@ -19,4 +20,5 @@ setup(name = "Hypernucleus",
       url='http://hypernucleus.pynguins.com',
       executables = [Executable("run_hypernucleus.py", base = base)],
       options = {'build_exe': {'excludes': excludes, 'packages': packages, 
-                               'include_files': include_files}})
+                               'include_files': include_files,
+                               'includes': includes}})
