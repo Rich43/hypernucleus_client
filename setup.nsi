@@ -12,7 +12,7 @@
 
   ;Name and file
   Name "Hypernucleus"
-  OutFile "hypernucleus10.exe"
+  OutFile "hypernucleus_10_32.exe"
 
   ;Default installation folder
   InstallDir "$LOCALAPPDATA\Hypernucleus"
