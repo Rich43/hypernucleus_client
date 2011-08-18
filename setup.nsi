@@ -1,6 +1,7 @@
 ;NSIS Modern User Interface
 ;Basic Example Script
 ;Written by Joost Verburg
+;Modified by Richie Ward
 
 ;--------------------------------
 ;Include Modern UI
@@ -9,20 +10,13 @@
 
 ;--------------------------------
 ;General
-
-  ;Name and file
   Name "Hypernucleus"
   OutFile "hypernucleus_10_32.exe"
-
-  ;Default installation folder
-  InstallDir "$LOCALAPPDATA\Hypernucleus"
+  InstallDir "$PROGRAMFILES\Hypernucleus"
+  InstallDirRegKey HKCU "Software\Hypernucleus" ""
+  RequestExecutionLevel admin
+  SetCompressor lzma
   
-  ;Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\Hypernucleus"
-
-  ;Request application privileges for Windows Vista
-  RequestExecutionLevel user
-
 ;--------------------------------
 ;Interface Settings
 
@@ -31,8 +25,6 @@
 ;--------------------------------
 ;Pages
 
-  !insertmacro MUI_PAGE_LICENSE "${NSISDIR}\Docs\Modern UI\License.txt"
-  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   
@@ -47,18 +39,19 @@
 ;--------------------------------
 ;Installer Sections
 
-Section "Dummy Section" SecDummy
-
+Section "Install" SecDummy
   SetOutPath "$INSTDIR"
-  
-  ;ADD YOUR OWN FILES HERE...
-  
-  ;Store installation folder
+  File /r build\exe.win32-3.2\*.*
+  CreateDirectory "$SMPROGRAMS\Hypernucleus"
+  CreateShortCut "$SMPROGRAMS\Hypernucleus\Hypernucleus.lnk" "$INSTDIR\run_hypernucleus.exe"
+  CreateShortCut "$DESKTOP\Hypernucleus.lnk" "$INSTDIR\run_hypernucleus.exe"
+  CreateShortCut "$SMPROGRAMS\Hypernucleus\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "Software\Hypernucleus" "" $INSTDIR
-  
-  ;Create uninstaller
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Hypernucleus" \
+                 "DisplayName" "Hypernucleus Client"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Hypernucleus" \
+                 "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-
 SectionEnd
 
 ;--------------------------------
@@ -76,13 +69,9 @@ SectionEnd
 ;Uninstaller Section
 
 Section "Uninstall"
-
-  ;ADD YOUR OWN FILES HERE...
-
-  Delete "$INSTDIR\Uninstall.exe"
-
-  RMDir "$INSTDIR"
-
+  RMDir /r "$INSTDIR"
+  RMDir /r "$SMPROGRAMS\Hypernucleus"
+  Delete "$DESKTOP\Hypernucleus.lnk"
   DeleteRegKey /ifempty HKCU "Software\Hypernucleus"
-
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Hypernucleus"
 SectionEnd
