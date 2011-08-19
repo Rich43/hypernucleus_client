@@ -1,7 +1,7 @@
 from os.path import dirname, join, exists
 def get_path(file_name):
     path_one = join("view", file_name)
-    path_two = join(dirname(__file__), "main.ui")
+    path_two = join(dirname(__file__), file_name)
     if exists(path_one):
         return path_one
     else:
