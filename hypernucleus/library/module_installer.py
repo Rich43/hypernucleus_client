@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
-from hypernucleus.library.paths import Paths
-from hypernucleus.model import GAME, DEP
+from .paths import Paths
+from ..model import GAME, DEP
 import urllib.request, urllib.error
 import os
 from os.path import join, basename, exists

@@ -1,9 +1,9 @@
 from PyQt4 import QtCore
 from PyQt4.QtGui import QProgressDialog, QMessageBox
-from hypernucleus.library.module_installer import (ModuleInstaller, 
+from ..library.module_installer import (ModuleInstaller, 
                                                    DownloadError)
-from hypernucleus.model import GAME, DEP
-from hypernucleus.model.xml_model import XmlModel as Model
+from ..model import GAME, DEP
+from ..model.xml_model import XmlModel as Model
 
 class InvalidVersion(Exception):
     pass

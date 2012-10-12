@@ -1,4 +1,4 @@
-from hypernucleus.model import GAME, DEP
+from . import GAME, DEP
 from urllib.error import URLError, HTTPError
 from urllib.request import urlopen
 from xml.etree.ElementTree import ElementTree, ParseError

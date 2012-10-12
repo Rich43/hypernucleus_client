@@ -6,16 +6,15 @@ Created on 23 Jul 2011
 
 from PyQt4 import uic, QtCore
 from PyQt4.QtGui import QMainWindow, QTreeView
-from hypernucleus.controller.helper_mixin import HelperMixin
-from hypernucleus.controller.settings import SettingsDialog
-from hypernucleus.library.game_manager import GameManager
-from hypernucleus.library.module_installer import ModuleInstaller
-from hypernucleus.model import GAME, DEP, INSTALLED, NOT_INSTALLED, \
-    INSTALLED_VERSION
-from hypernucleus.model.ini_manager import INIManager, WindowDimentions
-from hypernucleus.model.tree_model import TreeModel, TreeItem
-from hypernucleus.model.xml_model import XmlModel as Model
-from hypernucleus.view import main_path
+from .helper_mixin import HelperMixin
+from .settings import SettingsDialog
+from ..library.game_manager import GameManager
+from ..library.module_installer import ModuleInstaller
+from ..model import GAME, DEP, INSTALLED, NOT_INSTALLED, INSTALLED_VERSION
+from ..model.ini_manager import INIManager, WindowDimentions
+from ..model.tree_model import TreeModel, TreeItem
+from ..model.xml_model import XmlModel as Model
+from ..view import main_path
 import sys
 
 class MainWindow(QMainWindow, HelperMixin):

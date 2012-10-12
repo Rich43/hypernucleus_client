@@ -1,7 +1,7 @@
-from hypernucleus.library.paths import Paths
-from hypernucleus.model import GAME, DEP
-from hypernucleus.model.ini_manager import INIManager
-from hypernucleus.model.xml_model import XmlModel
+from .paths import Paths
+from ..model import GAME, DEP
+from ..model.ini_manager import INIManager
+from ..model.xml_model import XmlModel
 from os.path import join
 from subprocess import Popen, call
 import os

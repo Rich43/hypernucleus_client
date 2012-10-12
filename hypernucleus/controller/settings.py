@@ -1,7 +1,7 @@
 import platform
-from hypernucleus.view import settings_path
-from hypernucleus.model.ini_manager import INIManager
-from hypernucleus.model.xml_model import XmlModel as Model, InvalidURL
+from ..view import settings_path
+from ..model.ini_manager import INIManager
+from ..model.xml_model import XmlModel as Model, InvalidURL
 from PyQt4.QtGui import QDialog, QMessageBox
 from PyQt4 import uic, QtCore
 

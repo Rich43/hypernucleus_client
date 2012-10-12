@@ -15,11 +15,11 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from hypernucleus.library.paths import Paths, PROJNAME
+from ..library.paths import Paths, PROJNAME
 from os.path import exists
 from os import makedirs
 from configparser import ConfigParser, NoOptionError
-from hypernucleus.model import INSTALLED_VERSION
+from . import INSTALLED_VERSION
 
 class WindowDimentions:
     """
