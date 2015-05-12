@@ -4,8 +4,8 @@ Created on 23 Jul 2011
 @author: r
 '''
 
-from PyQt4 import uic, QtCore
-from PyQt4.QtGui import QMainWindow, QTreeView
+from PyQt5 import uic, QtCore
+from PyQt5.QtWidgets import QMainWindow, QTreeView
 from .helper_mixin import HelperMixin
 from .settings import SettingsDialog
 from ..library.game_manager import GameManager

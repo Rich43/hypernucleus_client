@@ -2,8 +2,8 @@ import platform
 from ..view import settings_path
 from ..model.ini_manager import INIManager
 from ..model.xml_model import XmlModel as Model, InvalidURL
-from PyQt4.QtGui import QDialog, QMessageBox
-from PyQt4 import uic, QtCore
+from PyQt5.QtWidgets import QDialog, QMessageBox
+from PyQt5 import uic, QtCore
 
 INVALID_REPO_FAIL = """You failed to set the repository URL correctly. 
 Hypernucleus needs this to download a list of operating systems and 

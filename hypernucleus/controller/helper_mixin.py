@@ -1,5 +1,5 @@
-from PyQt4 import QtCore
-from PyQt4.QtGui import QProgressDialog, QMessageBox
+from PyQt5 import QtCore
+from PyQt5.QtWidgets import QProgressDialog, QMessageBox
 from ..library.module_installer import (ModuleInstaller, 
                                                    DownloadError)
 from ..model import GAME, DEP

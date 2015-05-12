@@ -1,5 +1,5 @@
-from PyQt4 import Qt
-from PyQt4.QtGui import QMessageBox
+from PyQt5 import Qt
+from PyQt5.QtWidgets import QMessageBox
 from gettext import ngettext
 from .controller.main import MainWindow
 from .controller.settings import SettingsDialog
