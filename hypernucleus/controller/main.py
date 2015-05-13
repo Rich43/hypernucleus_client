@@ -41,12 +41,12 @@ class MainWindow(QMainWindow, HelperMixin):
         self.reset_models()
             
         # Connect all signals/events
-        self.quick_connect("actionExit", "exit")
-        self.quick_connect("actionRun", "run")
-        self.quick_connect("actionRefresh", "refresh")
-        self.quick_connect("actionStop", "stop")
-        self.quick_connect("actionUninstall", "uninstall")
-        self.quick_connect("actionSettings", "settings")
+        self.ui.actionExit.triggered.connect(self.exit)
+        self.ui.actionRun.triggered.connect(self.run)
+        self.ui.actionRefresh.triggered.connect(self.refresh)
+        self.ui.actionStop.triggered.connect(self.stop)
+        self.ui.actionUninstall.triggered.connect(self.uninstall)
+        self.ui.actionSettings.triggered.connect(self.settings)
         self.ui.treeGame.doubleClicked.connect(self.game)
         self.ui.treeDep.doubleClicked.connect(self.dep)
         self.ui.tabGameDep.currentChanged.connect(self.tab_changed)

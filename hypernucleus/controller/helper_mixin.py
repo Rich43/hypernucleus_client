@@ -1,4 +1,3 @@
-from PyQt5 import QtCore
 from PyQt5.QtWidgets import QProgressDialog, QMessageBox
 from ..library.module_installer import (ModuleInstaller, 
                                                    DownloadError)
@@ -15,15 +14,6 @@ class HelperMixin:
     """
     A series of helper functions to make working with PyQt4 easier!
     """
-    
-    def quick_connect(self, action_name, method_name):
-        """
-        'Quick Connect'
-        Use connect with less code :)
-        """
-        self.connect(getattr(self.ui, action_name), 
-                     QtCore.SIGNAL('triggered()'), 
-                     self, QtCore.SLOT(method_name + '()'))
     
     def expand(self, tree_view, tree_item):
         """
