@@ -13,7 +13,7 @@ from ..library.module_installer import ModuleInstaller
 from ..model import GAME, DEP, INSTALLED, NOT_INSTALLED, INSTALLED_VERSION
 from ..model.ini_manager import INIManager, WindowDimentions
 from ..model.tree_model import TreeModel, TreeItem
-from ..model.xml_model import XmlModel as Model
+from ..model.json_model import JsonModel as Model
 from ..view import main_path
 import sys
 
@@ -99,6 +99,7 @@ class MainWindow(QMainWindow, HelperMixin):
         # Populate root items with data, check to see if module is installed.
         installer = ModuleInstaller(None, module_type)
         for m_name in self.m.list_module_names(module_type):
+            m_name = m_name['name']
             rev_list = self.m.list_revisions(m_name, module_type)
             # Ignore this module if it has no revisions.
             if not len(rev_list):
@@ -119,6 +120,7 @@ class MainWindow(QMainWindow, HelperMixin):
                                     installed_version], tree_item)
             module_item.tag = (m_name, rev_list[0])
             for rev in rev_list:
+                rev = rev['version']
                 rev_item = TreeItem(str(rev), module_item)
                 rev_item.tag = (m_name, rev)
                 module_item.appendChild(rev_item)

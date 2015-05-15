@@ -1,7 +1,7 @@
 import platform
 from ..view import settings_path
 from ..model.ini_manager import INIManager
-from ..model.xml_model import XmlModel as Model, InvalidURL
+from ..model.json_model import JsonModel as Model, InvalidURL
 from PyQt5.QtWidgets import QDialog, QMessageBox
 from PyQt5 import uic, QtCore
 
@@ -130,19 +130,19 @@ class SettingsDialog(QDialog):
         xml_mdl = Model(current_url)
         
         # Add data to operating system combo
-        for os, os_disp in xml_mdl.list_operating_systems():
-            if os != "pi":
-                self.os_combo.addItem(os_disp)
-                self.os_combo.setItemData(self.os_combo.count() - 1, os)
-                if os_name and os_name == os:
+        for os in xml_mdl.list_operating_systems():
+            if os['name'] != "pi":
+                self.os_combo.addItem(os['display_name'])
+                self.os_combo.setItemData(self.os_combo.count() - 1, os['name'])
+                if os_name and os_name == os['name']:
                     self.os_combo.setCurrentIndex(self.os_combo.count() - 1)
         
         # Add data to architecture combo
-        for arch, arch_disp in xml_mdl.list_architectures():
-            if arch != "pi":
-                self.arch_combo.addItem(arch_disp)
+        for arch in xml_mdl.list_architectures():
+            if arch['name'] != "pi":
+                self.arch_combo.addItem(arch['display_name'])
                 self.arch_combo.setItemData(
-                                        self.arch_combo.count() - 1, arch)
-                if arch_name and arch_name == arch:
+                                        self.arch_combo.count() - 1, arch['name'])
+                if arch_name and arch_name == arch['name']:
                     self.arch_combo.setCurrentIndex(
                                         self.arch_combo.count() - 1)

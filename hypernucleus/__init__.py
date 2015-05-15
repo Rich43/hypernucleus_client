@@ -5,7 +5,7 @@ from .controller.main import MainWindow
 from .controller.settings import SettingsDialog
 from .library.game_manager import GameManager
 from .model.ini_manager import INIManager, WindowDimentions
-from .model.xml_model import XmlModel as Model, InvalidURL
+from .model.json_model import JsonModel as Model, InvalidURL
 from .view.icons import qInitResources
 import argparse
 import sys

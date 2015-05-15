@@ -1,7 +1,7 @@
 from .paths import Paths
 from ..model import GAME, DEP
 from ..model.ini_manager import INIManager
-from ..model.xml_model import XmlModel
+from ..model.json_model import JsonModel
 from os.path import join
 from subprocess import Popen, call
 import os
@@ -24,7 +24,7 @@ class GameManager:
         
         # Load XML File
         ini_data = INIManager()
-        xml_data = XmlModel(ini_data.get_xml_url())
+        xml_data = JsonModel(ini_data.get_xml_url())
          
         # Change directory to the game's folder
         os.chdir(join(p.games, game_name))

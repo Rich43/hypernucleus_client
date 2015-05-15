@@ -1,8 +1,7 @@
 from . import GAME, DEP
 from urllib.error import URLError, HTTPError
 from urllib.request import urlopen
-from xml.etree.ElementTree import ElementTree, ParseError
-from xml.sax.saxutils import quoteattr
+from json import loads
 
 class InvalidGameDepType(Exception):
     pass
@@ -16,14 +15,14 @@ class RevisionNotFound(Exception):
 class InvalidURL(Exception):
     pass
 
-class XmlModel:
+class JsonModel:
     """
-    An XML data model
+    An JSON data model
     """
     
     def __init__(self, url):
         try:
-            self.file = urlopen(url)
+            self.file = urlopen(url).read()
         except HTTPError as e:
             raise InvalidURL(e)
         except URLError as e:
@@ -32,9 +31,18 @@ class XmlModel:
             raise InvalidURL(e)
         
         try:
-            self.etree = ElementTree(file=self.file)
-        except ParseError as e:
+            self.jtree = loads(self.file.decode())
+        except ValueError as e:
             raise InvalidURL(e)
+
+        if not type(self.jtree) == type({}):
+            raise InvalidURL("Invalid Type")
+        if not "architectures" in self.jtree:
+            raise InvalidURL("No Architectures")
+        if not "operatingsystems" in self.jtree:
+            raise InvalidURL("No Operating Systems")
+        if not "gamedep" in self.jtree:
+            raise InvalidURL("No gamedep")
 
     def valid_type(self, module_type, none_allowed=True):
         if not none_allowed and module_type == None:
@@ -44,47 +52,36 @@ class XmlModel:
     
     def list_module_names(self, module_type):
         self.valid_type(module_type, False)
-        item = self.etree.findall(module_type)
-        return [x.find("name").text for x in item]
+        if not self.jtree['gamedep']:
+            return
+        for item in self.jtree['gamedep']:
+            if module_type in item:
+                yield(item[module_type])
     
     def get_module_name(self, name, module_type):
         self.valid_type(module_type, False)
-        name = quoteattr(name)
-        item = self.etree.find(module_type + "[name=%s]" % name)
-        if item is None:
-            raise ModuleNameNotFound("%s of type %s" % (name, module_type))
-        else:
-            return item
+        for item in self.list_module_names(module_type):
+            if item['name'] == name:
+                return item
+        raise ModuleNameNotFound("%s of type %s" % (name, module_type))
     
     def get_display_name(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
-        return item.find("display_name").text
+        return item["display_name"]
 
     def get_description(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
-        return item.find("description").text
+        return item["description"]
 
     def get_created(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
-        return item.find("created").text
+        return item["created"]
     
     def get_pictures(self, module_name, module_type):
-        item = self.get_module_name(module_name, module_type)
-        result = []
-        for x in item.findall("picture"):
-            try:
-                result.append(urlopen(x.text))
-            except URLError:
-                pass
-        return result
+        return []
     
     def list_dependencies(self, module_name, module_type):
         result = []
-        item = self.get_module_name(module_name, module_type)
-        itemtwo = item.findall("dependency")
-        for dep in itemtwo:
-            result.append((dep.find("name").text,
-                           float(dep.find("version").text)))
         return result
     
     def list_dependencies_recursive(self, module_name, module_type):
@@ -101,35 +98,29 @@ class XmlModel:
         Biggest number first.
         """
         item = self.get_module_name(module_name, module_type)
-        itemtwo = item.findall("revision")
-        result = [float(x.find("version").text) for x in itemtwo]
-        result.sort(reverse=True)
-        return result
+        return sorted(item['revisions'], key=lambda k: k['version'])
     
     def get_revision(self, module_name, module_type, revision):
         revision = str(revision)
-        item = self.get_module_name(module_name, module_type)
-        name = quoteattr(revision)
-        itemtwo = item.find("revision[version=%s]" % name)
-        if not len(itemtwo):
-            raise RevisionNotFound
-        else:
-            return itemtwo
+        for itemtwo in self.list_revisions(module_name, module_type):
+            if itemtwo['version'] == revision:
+                return itemtwo
+        raise RevisionNotFound
 
     def get_revision_source(self, module_name, module_type, revision, 
                             return_url=False):
         item = self.get_revision(module_name, module_type, revision)
         if return_url:
-            return item.find("source").text
-        return urlopen(item.find("source").text)
+            return item["source"]
+        return urlopen(item["source"])
 
     def get_revision_created(self, module_name, module_type, revision):
         item = self.get_revision(module_name, module_type, revision)
-        return item.find("created").text
+        return item["created"]
 
     def get_revision_module_type(self, module_name, module_type, revision):
         item = self.get_revision(module_name, module_type, revision)
-        return item.find("moduletype").text
+        return item["moduletype"]
     
     def list_revision_binaries(self, module_name, module_type, revision):
         item = self.get_revision(module_name, module_type, revision)
@@ -142,36 +133,20 @@ class XmlModel:
         return result
     
     def get_operating_system_display_name(self, operating_system):
-        operating_system = quoteattr(operating_system)
-        item = self.etree.find(
-                    "operatingsystem[name=%s]" % operating_system)
-        if item is not None:
-            return item.find("display_name").text
-        else:
+        for item in self.list_operating_systems():
+            if item['name'] == operating_system:
+                return item.find("display_name").text
             return None
     
     def get_architecture_display_name(self, architecture):
-        architecture = quoteattr(architecture)
-        item = self.etree.find(
-                    "architecture[name=%s]" % architecture)
-        if item is not None:
-            return item.find("display_name").text
-        else:
+        for item in self.list_architectures():
+            if item['name'] == architecture:
+                return item.find("display_name").text
             return None
     
     def list_operating_systems(self):
-        item = self.etree.findall("operatingsystem")
-        result = []
-        for os in item:
-            result.append((os.find("name").text,
-                           os.find("display_name").text))
-        return result
+        return self.jtree["operatingsystems"]
 
     def list_architectures(self):
-        item = self.etree.findall("architecture")
-        result = []
-        for arch in item:
-            result.append((arch.find("name").text,
-                           arch.find("display_name").text))
-        return result
+        return self.jtree["architectures"]
     

@@ -35,7 +35,7 @@ class INIManager:
     """
     Manages hypernucleus's INI File
     """
-    default_url = "http://hypernucleus.pynguins.com/outputs/xml"
+    default_url = "http://hypernucleus.pynguins.com/outputs/json"
     default_picture_width = 200
     conf_file = None
     ini_path = None
