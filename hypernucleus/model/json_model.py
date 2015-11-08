@@ -81,7 +81,11 @@ class JsonModel:
         return []
     
     def list_dependencies(self, module_name, module_type):
+        item = self.get_module_name(module_name, module_type)
         result = []
+        if "dependencies" in item:
+            for obj in item["dependencies"]:
+                result.append((obj["dependency"], obj["version"]))
         return result
     
     def list_dependencies_recursive(self, module_name, module_type):

@@ -31,11 +31,10 @@ class MainWindow(QMainWindow, HelperMixin):
         
         # Set the window dimensions from config.
         self.ini_mgr = INIManager()
-        dimentions = self.ini_mgr.get_window_dimentions()
-        if dimentions:
-            self.setGeometry(QtCore.QRect(dimentions.x, dimentions.y,
-                                          dimentions.width, 
-                                          dimentions.height))
+        dimensions = self.ini_mgr.get_window_dimentions()
+        if dimensions:
+            self.setGeometry(QtCore.QRect(dimensions.x, dimensions.y,
+                                          dimensions.width, dimensions.height))
         
         # Fill treeview with content.
         self.reset_models()
@@ -98,8 +97,8 @@ class MainWindow(QMainWindow, HelperMixin):
         
         # Populate root items with data, check to see if module is installed.
         installer = ModuleInstaller(None, module_type)
-        for m_name in self.m.list_module_names(module_type):
-            m_name = m_name['name']
+        for m_dict in self.m.list_module_names(module_type):
+            m_name = m_dict['name']
             rev_list = self.m.list_revisions(m_name, module_type)
             # Ignore this module if it has no revisions.
             if not len(rev_list):
@@ -115,9 +114,8 @@ class MainWindow(QMainWindow, HelperMixin):
             else:
                 tree_item = not_ins
                 installed_version = ''
-            module_item = TreeItem([self.m.get_display_name(m_name, 
-                                                            module_type), 
-                                    installed_version], tree_item)
+            module_item = TreeItem([m_dict['display_name'], installed_version],
+                                   tree_item)
             module_item.tag = (m_name, rev_list[0])
             for rev in rev_list:
                 rev = rev['version']
