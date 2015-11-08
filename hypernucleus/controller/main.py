@@ -116,7 +116,7 @@ class MainWindow(QMainWindow, HelperMixin):
                 installed_version = ''
             module_item = TreeItem([m_dict['display_name'], installed_version],
                                    tree_item)
-            module_item.tag = (m_name, rev_list[0])
+            module_item.tag = (m_name, rev_list[0]['version'])
             for rev in rev_list:
                 rev = rev['version']
                 rev_item = TreeItem(str(rev), module_item)

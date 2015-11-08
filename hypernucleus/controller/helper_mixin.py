@@ -69,7 +69,6 @@ class HelperMixin:
         """
         Run/Install a Game/Dependency
         """
-        print("run_game_dep")
         # Get dependencies from model
         dependencies = list(self.m.list_dependencies_recursive(module_name, 
                                                                module_type))
@@ -124,7 +123,6 @@ class HelperMixin:
         """
         Short wrapper around run_game_dep
         """
-        print("run_game_dep_wrapper")
         progress_dialog = {}
         label_text = "Installing %s %s, %s of %s"
         win_title = "Downloading..."
@@ -145,7 +143,6 @@ class HelperMixin:
             item = self.get_selected_item(self.ui.treeGame)
         else:
             item = self.get_selected_item(self.ui.treeDep)
-        print(item)
         if item:
             try:
                 # Display a progress dialog while downloading
@@ -170,7 +167,6 @@ class HelperMixin:
                     self.app.processEvents()
             # Cannot download a URL (i.e. 404 Not Found)
             except DownloadError:
-                print("download error")
                 # If we have not been here before.
                 if not retry:
                     # Reset the model and have another go.

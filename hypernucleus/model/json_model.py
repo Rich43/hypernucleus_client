@@ -128,12 +128,11 @@ class JsonModel:
     
     def list_revision_binaries(self, module_name, module_type, revision):
         item = self.get_revision(module_name, module_type, revision)
-        itemtwo = item.findall("binary")
+        itemtwo = item["binaries"]
         result = []
         for binary in itemtwo:
-            result.append((binary.find("binary").text,
-                           binary.find("operating_system").text,
-                           binary.find("architecture").text))
+            result.append((binary["binary"], binary["operating_system"],
+                           binary["architecture"]))
         return result
     
     def get_operating_system_display_name(self, operating_system):

@@ -22,11 +22,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ini_manager.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ini_manager.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/hypernucleus/model/ini_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="127" column="21" selection-start-line="127" selection-start-column="21" selection-end-line="127" selection-end-column="21" />
+            <state vertical-scroll-proportion="0.33259913">
+              <caret line="63" column="41" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -35,18 +35,28 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/hypernucleus/controller/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="170" column="43" selection-start-line="170" selection-start-column="43" selection-end-line="170" selection-end-column="43" />
+            <state vertical-scroll-proportion="-10.785714">
+              <caret line="151" column="22" selection-start-line="151" selection-start-column="20" selection-end-line="151" selection-end-column="22" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="json_model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="json_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/hypernucleus/model/json_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3429487">
-              <caret line="85" column="29" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
+            <state vertical-scroll-proportion="-10.785714">
+              <caret line="115" column="56" selection-start-line="115" selection-start-column="55" selection-end-line="115" selection-end-column="56" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="helper_mixin.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/hypernucleus/controller/helper_mixin.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-12.071428">
+              <caret line="168" column="33" selection-start-line="168" selection-start-column="33" selection-end-line="168" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -57,7 +67,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/hypernucleus/controller/helper_mixin.py" />
         <option value="$PROJECT_DIR$/hypernucleus/model/xml_model.py" />
         <option value="$PROJECT_DIR$/hypernucleus/library/game_manager.py" />
         <option value="$PROJECT_DIR$/hypernucleus/__init__.py" />
@@ -65,6 +74,7 @@
         <option value="$PROJECT_DIR$/hypernucleus/model/ini_manager.py" />
         <option value="$PROJECT_DIR$/hypernucleus/controller/main.py" />
         <option value="$PROJECT_DIR$/hypernucleus/model/json_model.py" />
+        <option value="$PROJECT_DIR$/hypernucleus/controller/helper_mixin.py" />
       </list>
     </option>
   </component>
@@ -220,6 +230,8 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../hypernucleus-server" />
     <property name="FullScreen" value="false" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.appearance" />
+    <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -553,13 +565,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hypernucleus/controller/helper_mixin.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.30448717">
-          <caret line="19" column="31" selection-start-line="19" selection-start-column="31" selection-end-line="19" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/hypernucleus/controller/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-1.2275641">
@@ -581,26 +586,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hypernucleus/model/ini_manager.py">
+    <entry file="file://$PROJECT_DIR$/hypernucleus/model/json_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="127" column="21" selection-start-line="127" selection-start-column="21" selection-end-line="127" selection-end-column="21" />
+        <state vertical-scroll-proportion="-10.785714">
+          <caret line="115" column="56" selection-start-line="115" selection-start-column="55" selection-end-line="115" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/hypernucleus/controller/helper_mixin.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.071428">
+          <caret line="168" column="33" selection-start-line="168" selection-start-column="33" selection-end-line="168" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/hypernucleus/controller/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="170" column="43" selection-start-line="170" selection-start-column="43" selection-end-line="170" selection-end-column="43" />
+        <state vertical-scroll-proportion="-10.785714">
+          <caret line="151" column="22" selection-start-line="151" selection-start-column="20" selection-end-line="151" selection-end-column="22" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/hypernucleus/model/json_model.py">
+    <entry file="file://$PROJECT_DIR$/hypernucleus/model/ini_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3429487">
-          <caret line="85" column="29" selection-start-line="85" selection-start-column="29" selection-end-line="85" selection-end-column="29" />
+        <state vertical-scroll-proportion="0.33259913">
+          <caret line="63" column="41" selection-start-line="63" selection-start-column="39" selection-end-line="63" selection-end-column="41" />
           <folding />
         </state>
       </provider>
