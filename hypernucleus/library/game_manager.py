@@ -68,7 +68,8 @@ class GameManager:
         process = Popen([self.apppath, "-r", game_name])
         # Add process to dictionary.
         self.gamelist[game_name] = process
-        
+        print(self.gamelist)
+
     def cleanup(self):
         """
         Removes stopped games
@@ -81,6 +82,7 @@ class GameManager:
         """
         Stop a game, linux/mac command.
         """
+        print(self.gamelist)
         pid = str(self.gamelist[game_name].pid)
         call(["kill", pid])
         del(self.gamelist[game_name])

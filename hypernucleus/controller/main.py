@@ -16,6 +16,7 @@ from ..model.tree_model import TreeModel, TreeItem
 from ..model.json_model import JsonModel as Model
 from ..view import main_path
 import sys
+import platform
 
 class MainWindow(QMainWindow, HelperMixin):
     """
@@ -251,9 +252,14 @@ class MainWindow(QMainWindow, HelperMixin):
         """
         Kill the currently running game.
         """
-        #self.game_mgr.stop_game_linux_mac(game_name)
-        #self.game_mgr.stop_game_windows(game_name)
-        pass
+        tab_index = self.ui.tabGameDep.currentIndex()
+        if tab_index == 0:
+            item = self.get_selected_item(self.ui.treeGame)
+            if item:
+                if platform.system == "Windows":
+                    self.game_mgr.stop_game_windows(item.tag[0])
+                else:
+                    self.game_mgr.stop_game_linux_mac(item.tag[0])
     
     @QtCore.pyqtSlot()
     def uninstall(self):
