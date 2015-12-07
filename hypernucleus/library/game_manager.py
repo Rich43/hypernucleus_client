@@ -32,8 +32,7 @@ class GameManager:
         # Get various needed data
         game_ins_ver = ini_data.get_installed_version(game_name)
         game_module_type = xml_data.get_revision_module_type(game_name, 
-                                                             GAME, 
-                                                             game_ins_ver)
+                                                             GAME, game_ins_ver)
         
         # Figure out if its a file or folder module
         if game_module_type == "file":
@@ -45,8 +44,7 @@ class GameManager:
         for dep_name, dep_ver in \
                     xml_data.list_dependencies_recursive(game_name, GAME):
             dep_module_type = xml_data.get_revision_module_type(dep_name,
-                                                                DEP,
-                                                                dep_ver)
+                                                                DEP, dep_ver)
             if dep_module_type == "file":
                 sys.path.append(join(p.dependencies, dep_name))
             else:
@@ -68,7 +66,6 @@ class GameManager:
         process = Popen([self.apppath, "-r", game_name])
         # Add process to dictionary.
         self.gamelist[game_name] = process
-        print(self.gamelist)
 
     def cleanup(self):
         """
@@ -82,7 +79,6 @@ class GameManager:
         """
         Stop a game, linux/mac command.
         """
-        print(self.gamelist)
         pid = str(self.gamelist[game_name].pid)
         call(["kill", pid])
         del(self.gamelist[game_name])

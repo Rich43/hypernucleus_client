@@ -5,15 +5,20 @@ Created on 23 Jul 2011
 '''
 
 from PyQt5 import uic, QtCore
-from PyQt5.QtWidgets import QMainWindow, QTreeView
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QMainWindow, QTreeView, QLabel
 from .helper_mixin import HelperMixin
 from .settings import SettingsDialog
 from ..library.game_manager import GameManager
 from ..library.module_installer import ModuleInstaller
+from ..library.paths import Paths
 from ..model import GAME, DEP, INSTALLED, NOT_INSTALLED, INSTALLED_VERSION
 from ..model.ini_manager import INIManager, WindowDimentions
 from ..model.tree_model import TreeModel, TreeItem
 from ..model.json_model import JsonModel as Model
+from os.path import join, exists, splitext
+from os import makedirs
+from urllib.request import urlopen
 from ..view import main_path
 import sys
 import platform
@@ -157,7 +162,26 @@ class MainWindow(QMainWindow, HelperMixin):
                                 self.m.get_created(m_name, module_type))
             self.ui.projectDescriptionLineEdit.setText(
                                 self.m.get_description(m_name, module_type))
-            
+            # Delete pictures in dialog
+            while self.ui.verticalPic.takeAt(0):
+                pass
+            # Add new pictures
+            p = Paths()
+            for picture in self.m.get_pictures(m_name, module_type):
+                directory = join(p.pictures, picture['uuid'])
+                file_name = join(directory, picture['thumb_name'])
+                try:
+                    makedirs(directory)
+                except FileExistsError:
+                    pass
+                if not exists(file_name):
+                    fl = urlopen(picture["thumb_url"])
+                    open(file_name, "wb").write(fl.read())
+                    fl.close()
+                pixmap = QPixmap(file_name)
+                lbl_1 = QLabel('')
+                lbl_1.setPixmap(pixmap)
+                self.ui.verticalPic.addWidget(lbl_1)
             # Check to see if module is installed and
             # show the installed version if it is.
             if installer.is_module_installed(m_name, module_type):

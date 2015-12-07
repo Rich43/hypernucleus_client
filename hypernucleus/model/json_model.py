@@ -78,7 +78,8 @@ class JsonModel:
         return item["created"]
     
     def get_pictures(self, module_name, module_type):
-        return []
+        item = self.get_module_name(module_name, module_type)
+        return item["pictures"]
     
     def list_dependencies(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
