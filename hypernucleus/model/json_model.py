@@ -1,7 +1,18 @@
 from . import GAME, DEP
-from urllib.error import URLError, HTTPError
-from urllib.request import urlopen
+import pycurl
+from io import BytesIO
 from json import loads
+
+def curl_wrapper(url):
+	buffer = BytesIO()
+	c = pycurl.Curl()
+	c.setopt(c.URL, url)
+	c.setopt(c.WRITEDATA, buffer)
+	c.perform()
+	c.close()
+	body = buffer.getvalue()
+	return body.decode('iso-8859-1')
+
 
 class InvalidGameDepType(Exception):
     pass
@@ -22,16 +33,14 @@ class JsonModel:
     
     def __init__(self, url):
         try:
-            self.file = urlopen(url).read()
-        except HTTPError as e:
-            raise InvalidURL(e)
-        except URLError as e:
+            self.file = curl_wrapper(url.strip())
+        except pycurl.error as e:
             raise InvalidURL(e)
         except ValueError as e:
             raise InvalidURL(e)
         
         try:
-            self.jtree = loads(self.file.decode())
+            self.jtree = loads(self.file)
         except ValueError as e:
             raise InvalidURL(e)
 
