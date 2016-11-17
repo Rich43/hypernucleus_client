@@ -5,3 +5,4 @@ hypernucleus/view/icons.py
 *__pycache__*
 *icons.py
 *.bak
+.idea
