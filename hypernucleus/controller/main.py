@@ -5,7 +5,7 @@ Created on 23 Jul 2011
 '''
 
 from PyQt5 import uic, QtCore
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QTreeView, QLabel
 from .helper_mixin import HelperMixin
 from .settings import SettingsDialog
@@ -16,7 +16,7 @@ from ..model import GAME, DEP, INSTALLED, NOT_INSTALLED, INSTALLED_VERSION
 from ..model.ini_manager import INIManager, WindowDimentions
 from ..model.tree_model import TreeModel, TreeItem
 from ..model.json_model import JsonModel as Model
-from os.path import join, exists, splitext
+from os.path import join, exists
 from os import makedirs
 from urllib.request import urlopen
 from ..view import main_path

@@ -1,46 +1,39 @@
-from . import GAME, DEP
-import pycurl
-from io import BytesIO
-from json import loads
+from urllib.request import urlopen
 
-def curl_wrapper(url):
-	buffer = BytesIO()
-	c = pycurl.Curl()
-	c.setopt(c.URL, url)
-	c.setopt(c.WRITEDATA, buffer)
-	c.perform()
-	c.close()
-	body = buffer.getvalue()
-	return body.decode('iso-8859-1')
+import requests
+
+from . import GAME, DEP
 
 
 class InvalidGameDepType(Exception):
     pass
 
+
 class ModuleNameNotFound(Exception):
     pass
+
 
 class RevisionNotFound(Exception):
     pass
 
+
 class InvalidURL(Exception):
     pass
+
 
 class JsonModel:
     """
     An JSON data model
     """
-    
+
     def __init__(self, url):
         try:
-            self.file = curl_wrapper(url.strip())
-        except pycurl.error as e:
+            self.file = requests.get(url.strip())
+        except requests.exceptions.RequestException as e:
             raise InvalidURL(e)
-        except ValueError as e:
-            raise InvalidURL(e)
-        
+
         try:
-            self.jtree = loads(self.file)
+            self.jtree = self.file.json()
         except ValueError as e:
             raise InvalidURL(e)
 
@@ -58,22 +51,22 @@ class JsonModel:
             raise InvalidGameDepType
         if not module_type in [GAME, DEP, None]:
             raise InvalidGameDepType
-    
+
     def list_module_names(self, module_type):
         self.valid_type(module_type, False)
         if not self.jtree['gamedep']:
             return
         for item in self.jtree['gamedep']:
             if module_type in item:
-                yield(item[module_type])
-    
+                yield (item[module_type])
+
     def get_module_name(self, name, module_type):
         self.valid_type(module_type, False)
         for item in self.list_module_names(module_type):
             if item['name'] == name:
                 return item
         raise ModuleNameNotFound("%s of type %s" % (name, module_type))
-    
+
     def get_display_name(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
         return item["display_name"]
@@ -85,11 +78,11 @@ class JsonModel:
     def get_created(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
         return item["created"]
-    
+
     def get_pictures(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
         return item["pictures"]
-    
+
     def list_dependencies(self, module_name, module_type):
         item = self.get_module_name(module_name, module_type)
         result = []
@@ -97,7 +90,7 @@ class JsonModel:
             for obj in item["dependencies"]:
                 result.append((obj["dependency"], obj["version"]))
         return result
-    
+
     def list_dependencies_recursive(self, module_name, module_type):
         dependencies = self.list_dependencies(module_name, module_type)
         if dependencies:
@@ -105,15 +98,15 @@ class JsonModel:
                 yield (m_name, ver)
                 for item in self.list_dependencies_recursive(m_name, DEP):
                     yield item
-    
+
     def list_revisions(self, module_name, module_type):
         """
         Return sorted list of revisions.
         Biggest number first.
         """
         item = self.get_module_name(module_name, module_type)
-        return sorted(item['revisions'], key=lambda k: k['version'])
-    
+        return sorted(item['revisions'], key=lambda k: k['version'], reverse=True)
+
     def get_revision(self, module_name, module_type, revision):
         revision = str(revision)
         for itemtwo in self.list_revisions(module_name, module_type):
@@ -121,7 +114,7 @@ class JsonModel:
                 return itemtwo
         raise RevisionNotFound
 
-    def get_revision_source(self, module_name, module_type, revision, 
+    def get_revision_source(self, module_name, module_type, revision,
                             return_url=False):
         item = self.get_revision(module_name, module_type, revision)
         if return_url:
@@ -135,7 +128,7 @@ class JsonModel:
     def get_revision_module_type(self, module_name, module_type, revision):
         item = self.get_revision(module_name, module_type, revision)
         return item["moduletype"]
-    
+
     def list_revision_binaries(self, module_name, module_type, revision):
         item = self.get_revision(module_name, module_type, revision)
         itemtwo = item["binaries"]
@@ -144,22 +137,21 @@ class JsonModel:
             result.append((binary["binary"], binary["operating_system"],
                            binary["architecture"]))
         return result
-    
+
     def get_operating_system_display_name(self, operating_system):
         for item in self.list_operating_systems():
             if item['name'] == operating_system:
                 return item.find("display_name").text
             return None
-    
+
     def get_architecture_display_name(self, architecture):
         for item in self.list_architectures():
             if item['name'] == architecture:
                 return item.find("display_name").text
             return None
-    
+
     def list_operating_systems(self):
         return self.jtree["operatingsystems"]
 
     def list_architectures(self):
         return self.jtree["architectures"]
-    
