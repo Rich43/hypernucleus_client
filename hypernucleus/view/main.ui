@@ -111,7 +111,7 @@
       </widget>
       <widget class="QTabWidget" name="tabInfoPic">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tabInfo">
         <attribute name="icon">
@@ -288,8 +288,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>611</width>
-              <height>540</height>
+              <width>575</width>
+              <height>529</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_8">
