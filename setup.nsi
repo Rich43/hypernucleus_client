@@ -41,7 +41,7 @@
 
 Section "Install" SecDummy
   SetOutPath "$INSTDIR"
-  File /r build\exe.win32-3.2\*.*
+  File /r build\exe.win32-3.5\*.*
   CreateDirectory "$SMPROGRAMS\Hypernucleus"
   CreateShortCut "$SMPROGRAMS\Hypernucleus\Hypernucleus.lnk" "$INSTDIR\run_hypernucleus.exe"
   CreateShortCut "$DESKTOP\Hypernucleus.lnk" "$INSTDIR\run_hypernucleus.exe"
