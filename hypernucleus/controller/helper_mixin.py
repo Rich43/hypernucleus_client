@@ -12,7 +12,7 @@ class BinaryNotFound(Exception):
 
 class HelperMixin:
     """
-    A series of helper functions to make working with PyQt4 easier!
+    A series of helper functions to make working with PyQt5 easier!
     """
     
     def expand(self, tree_view, tree_item):
@@ -75,7 +75,7 @@ class HelperMixin:
         
         # Add myself to dependencies if i am one.
         if module_type == DEP:
-            dependencies.append((module_name, module_type))
+            dependencies.append((module_name, revision))
             
         # Get some data from INI File
         chunk_size = self.ini_mgr.get_chunk_size()
