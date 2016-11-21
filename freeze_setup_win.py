@@ -11,8 +11,8 @@ include_files = glob.glob(join("hypernucleus", "view", "*.ui"))
 include_files = [(p, sep.join(p.split(sep)[1:])) for p in include_files]
 include_files.append("pythoncom.py")
 include_files.append("pywintypes.py")
-includes = ["multiprocessing", "pycurl", "pythoncom", "pywintypes",
-            "sysconfig", "distutils"]
+includes = ["multiprocessing", "PyQt5", "requests", "pythoncom", 
+            "pywintypes", "sysconfig", "distutils"]
 excludes = []
 packages = []
 
